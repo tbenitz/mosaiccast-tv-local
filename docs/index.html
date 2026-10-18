@@ -1,0 +1,540 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="dark">
+<title>MosaicCast TV — Multi-Stream Theater</title>
+<style>
+:root{color-scheme:dark;--bg:#070b12;--surface:#101722;--surface2:#151f2d;--raised:#1c2939;--line:#28374c;--text:#eef4fc;--dim:#9bb0c7;--sub:#69829d;--cyan:#49d5ee;--purple:#a18dff;--green:#53ddb1;--red:#ff7585;--radius:15px;font-family:Inter,ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 67% -15%,#12334e 0,transparent 40%),var(--bg);color:var(--text);font-size:13px}button,input,select{font:inherit}button{cursor:pointer;color:inherit}button:disabled{opacity:.45;cursor:not-allowed}button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--cyan);outline-offset:2px} .hidden{display:none!important}
+.shell{min-height:100vh;display:flex;flex-direction:column}.topbar{height:70px;flex:none;padding:0 27px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #1b2b3d;background:#09121dd9;gap:12px}.brand{display:flex;align-items:center;gap:12px}.logo{height:38px;width:38px;border-radius:12px;display:grid;place-items:center;background:linear-gradient(138deg,#00a9c7,#766eff);box-shadow:0 7px 25px #4b9fff3a;font-size:22px}.brand-name{font-weight:760;font-size:18px;letter-spacing:-.6px}.brand-name span{font-weight:350;color:#91b9d5}.brand-small{margin-top:1px;color:var(--sub);font-size:11px;letter-spacing:.4px}.live-pill{border:1px solid #355166;background:#122231;color:#9dc1d2;padding:7px 11px;border-radius:999px;font-size:11px;font-weight:660;letter-spacing:.2px}.dot{display:inline-block;border-radius:100%;width:7px;height:7px;background:var(--green);margin-right:7px;box-shadow:0 0 9px #53ddb160}.top-actions{display:flex;align-items:center;gap:9px}.btn{border-radius:9px;border:1px solid var(--line);background:#172332;padding:10px 13px;display:inline-flex;align-items:center;justify-content:center;gap:7px;font-weight:630;white-space:nowrap;transition:background .15s,border-color .15s}.btn:hover:not(:disabled){background:#22364b;border-color:#4f687d}.btn.primary{color:#081723;background:linear-gradient(125deg,#54d8f0,#76e0ed);border:1px solid #71e5f1}.btn.primary:hover:not(:disabled){background:#8aedf7}.btn.secondary{background:#25364f;border-color:#36516d}.btn.danger{background:#41242e;border-color:#71374b;color:#ffd5da}.btn.sm{padding:7px 9px;font-size:11.5px;border-radius:8px}.btn.icon-btn{width:35px;height:35px;padding:0;font-size:15px}.btn.active{border-color:#69dce7;color:#89f6ff;background:#123743}.btn:active:not(:disabled){transform:translateY(1px)}
+.workspace{flex:1;display:grid;grid-template-columns:minmax(0,1fr) 320px;min-height:0}.left{min-width:0;padding:24px clamp(12px,2.7vw,38px) 28px;display:flex;flex-direction:column;gap:17px}.right{min-width:0;border-left:1px solid #203044;background:#0c1420b8;padding:22px 18px;display:flex;flex-direction:column;gap:23px}.section-title{font-size:11px;text-transform:uppercase;letter-spacing:1.3px;font-weight:780;color:#819cba;margin-bottom:13px;display:flex;align-items:center;justify-content:space-between}.section-title .count{background:#1b3143;color:#a2d8e8;border-radius:6px;padding:3px 8px;letter-spacing:0;font-size:11px}.stage-heading{display:flex;align-items:center;gap:14px;justify-content:space-between}.stage-heading h1{font-size:21px;letter-spacing:-.65px;margin:0 0 5px;font-weight:750}.muted{color:var(--dim)}.stage-heading .muted{font-size:12px}.heading-actions{display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-end}.stage-frame{background:#0b111a;border:1px solid #294056;border-radius:17px;box-shadow:0 16px 75px #0007;overflow:hidden;position:relative}.stage{position:relative;isolation:isolate;overflow:hidden;background:#030609;aspect-ratio:16/9;width:100%;user-select:none;-webkit-user-select:none;touch-action:pan-x pan-y;border-radius:inherit}.stage:fullscreen{width:100vw;height:100vh;aspect-ratio:auto;border-radius:0;background:#000}.stage::-webkit-media-controls{display:none}.stage.fullview{border-radius:0}.stage video{display:block;width:100%;height:100%;object-fit:contain;background:#000;pointer-events:none}.stage-main{position:absolute;inset:0;overflow:hidden}.stage-main video{object-fit:contain}.stage-empty{display:grid;place-items:center;position:absolute;inset:0;background:radial-gradient(ellipse at 50% 40%,#173452,#060c16 66%);text-align:center}.empty-symbol{height:84px;width:84px;display:grid;place-items:center;margin:0 auto 18px;border-radius:25px;border:1px solid #3c6685;background:#1b3a54;color:#8deeff;font-size:40px;box-shadow:0 0 50px #10a4ca30}.stage-empty h2{font-size:23px;margin:0 0 9px}.stage-empty p{margin:0;color:#93b0ce;line-height:1.7;font-size:13px}.stage-empty strong{color:#d4eefa}.stage-overlays{position:absolute;inset:0;pointer-events:none}.overlay{position:absolute;pointer-events:auto;overflow:hidden;touch-action:none;border:2px solid #ffffffc2;border-radius:11px;box-shadow:0 7px 26px #000c,0 0 0 1px #0009;background:#020303;cursor:grab;will-change:left,top,width,height}.overlay.dragging{cursor:grabbing;box-shadow:0 10px 35px #000e,0 0 0 1px var(--cyan);border-color:var(--cyan);z-index:999!important}.overlay video{object-fit:contain}.overlay::after{content:"";pointer-events:none;position:absolute;inset:0;box-shadow:inset 0 0 0 1px #0008}.overlay-label{position:absolute;top:8px;left:8px;max-width:calc(100% - 16px);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;background:#010814bd;border:1px solid #ffffff22;padding:5px 8px;border-radius:6px;color:#fff;font-weight:700;font-size:10px;pointer-events:none;opacity:0;transition:opacity .15s}.overlay:hover .overlay-label{opacity:1}.overlay-controls{position:absolute;right:7px;top:7px;display:flex;gap:5px;opacity:0;transition:opacity .15s}.overlay:hover .overlay-controls{opacity:1}.overlay-controls button{border:1px solid #ffffff55;background:#101b27e3;padding:5px 7px;border-radius:6px;color:#fff;font-size:10px;font-weight:750;cursor:pointer}.overlay-controls button:hover{background:#2a4e6e}.resizer{position:absolute;right:0;bottom:0;width:26px;height:26px;cursor:nwse-resize;z-index:3;opacity:0;background:linear-gradient(135deg,transparent 56%,#89effe 57%,#89effe 65%,transparent 66%,transparent 75%,#89effe 76%,#89effe 84%,transparent 85%);border-bottom-right-radius:9px}.overlay:hover .resizer{opacity:1}.stage:fullscreen .overlay-label,.stage:fullscreen .overlay-controls,.stage:fullscreen .resizer{opacity:0!important}.stage:fullscreen .overlay{border:0;border-radius:0;box-shadow:none}.stage:fullscreen .overlay::after{box-shadow:none}.stage:fullscreen .resizer{background:none;opacity:0;pointer-events:auto;cursor:nwse-resize}.stage:fullscreen .overlay{cursor:grab}.stage:fullscreen .overlay.dragging{cursor:grabbing}
+.stage-bar{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:13px;color:#7792b0;font-size:11.5px}.stage-bar b{color:#aed3eb;font-weight:650}.stage-tools{display:flex;gap:7px;flex-wrap:wrap}.guide{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}.guide-card{border:1px solid #26374b;background:#0f1b29;padding:14px;border-radius:11px}.guide-card .step{display:inline-grid;place-items:center;width:22px;height:22px;border-radius:8px;background:#193a4c;color:#80edff;font-weight:800;font-size:11px;margin-bottom:10px}.guide-card b{display:block;font-size:12px;margin-bottom:6px}.guide-card p{color:#829bb7;margin:0;font-size:11.5px;line-height:1.5}
+.source-list{display:flex;flex-direction:column;gap:9px}.source-empty{padding:20px 10px;background:#101b27;border:1px dashed #31465e;color:#829cb7;border-radius:9px;text-align:center;font-size:12px;line-height:1.7}.source-card{background:#111e2c;border:1px solid #293b4e;border-radius:11px;padding:10px;display:flex;flex-direction:column;gap:10px}.source-card.is-main{border-color:#407e94;background:#122533}.source-head{display:flex;align-items:center;gap:8px}.source-num{height:27px;width:27px;display:grid;place-items:center;border-radius:7px;color:#9cdde5;background:#1e3d4d;font-weight:800;font-size:11px;flex:none}.source-name{min-width:0;flex:1;font-weight:650;text-overflow:ellipsis;white-space:nowrap;overflow:hidden;cursor:pointer}.source-name:hover{color:#8ae9fc}.source-kind{font-size:9px;border:1px solid #34465a;background:#213247;color:#a7bcce;padding:3px 5px;border-radius:5px;letter-spacing:.7px;font-weight:750}.source-actions{display:flex;gap:5px;flex-wrap:wrap}.source-actions .btn{flex:1;min-width:0}.source-audio{display:flex;align-items:center;gap:8px}.source-audio input{flex:1;min-width:0}.source-audio small{font-size:10px;color:#90a8bb;min-width:32px;text-align:right}.file-tools{padding-top:2px;display:flex;flex-direction:column;gap:6px}.file-seek{display:flex;align-items:center;gap:7px}.file-seek input{flex:1;min-width:0}.file-seek span{font-size:10px;white-space:nowrap;color:#a4bacb}.file-options{display:flex;align-items:center;gap:8px}.file-options select{background:#203248;color:#b8d8e9;border:1px solid #3b5065;border-radius:6px;padding:4px;flex:1;min-width:0;font-size:11px}.file-options label{display:flex;gap:5px;align-items:center;font-size:11px;color:#a4bacb}.source-note{font-size:10px;color:#7890a8}.source-note .yes{color:var(--green)}.source-note .no{color:#efb27c}.shortcuts{padding:9px;border-top:1px solid #223349;color:#7b93ac;line-height:1.8;font-size:11px}.tiny-badge{background:#26384e;border:1px solid #36526a;color:#b0d0e2;border-radius:5px;padding:1px 5px;font-size:10px;font-weight:700}
+.settings{display:flex;flex-direction:column;gap:14px}.setting{display:flex;flex-direction:column;gap:6px}.setting>label,.setting .rowlabel{display:flex;justify-content:space-between;align-items:center;color:#c9d9e9;font-size:12px;font-weight:620;gap:10px}.setting small{color:#7992aa;font-size:10.5px;line-height:1.5}.setting select,.setting input:not([type="checkbox"]):not([type="range"]){color:#e4f1fe;background:#172638;border:1px solid #34475e;border-radius:8px;min-width:0;padding:9px;outline:none;width:100%}input[type=range]{accent-color:#57d6ec;height:17px;cursor:pointer}input[type=checkbox]{accent-color:#55daf2;width:15px;height:15px;margin:0;cursor:pointer}.check{display:flex;align-items:center;gap:9px;color:#b6cadf;cursor:pointer;line-height:1.4;font-size:12px}.global-volume{display:flex;align-items:center;gap:9px}.global-volume input{flex:1;min-width:0}.status-row{display:flex;justify-content:space-between;align-items:center;color:#84a0b7;gap:8px;font-size:11px}.status-row .status-text{color:#b9d3e5;font-weight:680}.record-dot{width:8px;height:8px;border-radius:50%;display:inline-block;background:#ff687d;box-shadow:0 0 0 3px #ff687d2a;margin-right:5px}.bottom-actions{display:flex;gap:8px;flex-wrap:wrap}.smallprint{border-top:1px solid #273748;padding-top:11px;font-size:10.5px;line-height:1.7;color:#7894ac}.kbd{background:#203043;padding:2px 5px;border-radius:4px;color:#acd6ee;font-size:10px}
+.notice-stack{position:fixed;z-index:100000;right:22px;bottom:22px;display:flex;flex-direction:column;gap:9px;pointer-events:none;max-width:min(430px,calc(100vw - 34px))}.toast{padding:12px 16px;background:#182939;border:1px solid #46778a;border-radius:10px;color:#d8f2ff;box-shadow:0 12px 35px #000b;pointer-events:auto;font-size:12px;line-height:1.5;animation:in .15s ease}.toast.bad{border-color:#a25a62;color:#ffe2e4}.toast button{float:right;border:0;background:none;color:inherit;margin-left:14px;font-weight:900;font-size:13px}.toast a{color:#8beaff}@keyframes in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.overlay-modal{position:fixed;z-index:1000;inset:0;background:#000b;display:grid;place-items:center;padding:16px}.modal{width:min(470px,100%);border-radius:15px;border:1px solid #435b74;padding:22px;background:#122031;box-shadow:0 18px 80px #000c}.modal h2{margin:0 0 12px}.modal p{line-height:1.7;color:#afc1d5}.modal .modal-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:18px}
+body.pip-host{background:#000;overflow:hidden}body.pip-host>.stage{position:fixed;inset:0;width:100vw;height:100vh;border:0;border-radius:0;aspect-ratio:auto}body.pip-host .overlay-label{opacity:0}body.pip-host .overlay:hover .overlay-label{opacity:1}body.pip-host .stage-main{position:absolute}
+.floating-placeholder{min-height:230px;display:grid;place-items:center;text-align:center;padding:30px;background:#0d1d2c;color:#96b9d3}.floating-placeholder h2{font-size:19px;color:#e5f4ff}
+@media(max-width:1100px){.workspace{grid-template-columns:minmax(0,1fr) 285px}.top-actions .live-pill{display:none}}@media(max-width:820px){.workspace{display:flex;flex-direction:column}.right{border-left:0;border-top:1px solid #273b50}.left{padding:17px 12px}.topbar{padding:0 12px}.brand-small{display:none}.top-actions{gap:5px}.top-actions .btn{padding:8px}.guide{grid-template-columns:1fr}.guide-card{padding:10px}.heading-actions{gap:5px}.stage-heading{align-items:flex-start;flex-wrap:wrap}.stage-heading h1{font-size:18px}.source-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}}
+
+/* Cinema controls — invisible while watching, immediately accessible on motion */
+.stage .cinema-hud,.stage .cinema-drawer{display:none}
+.stage.cinema-mode{--glass:#0a1420eb;--glass-edge:#7896ae50}
+.stage.cinema-mode.cinema-idle{cursor:none}
+.stage.cinema-mode .cinema-hud{display:flex;position:absolute;inset:0;z-index:2000;pointer-events:none;flex-direction:column;justify-content:space-between;padding:clamp(12px,2.1vw,27px);transition:opacity .24s ease;opacity:1}
+.stage.cinema-mode.cinema-idle .cinema-hud{opacity:0;visibility:hidden;transition:opacity .4s ease,visibility 0s linear .4s}
+.stage.cinema-mode .hud-top,.stage.cinema-mode .hud-bottom{pointer-events:auto;max-width:100%;border:1px solid var(--glass-edge);border-radius:16px;background:var(--glass);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);box-shadow:0 14px 40px #0008}
+.stage.cinema-mode .hud-top{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;gap:12px;min-height:65px}
+.hud-brand{display:flex;gap:12px;align-items:center;min-width:0}.hud-logo{display:grid;place-items:center;width:41px;height:41px;flex:none;background:linear-gradient(145deg,#19c3e2,#7768f0);border-radius:11px;color:#fff;font-size:22px}
+.hud-title{min-width:0}.hud-title strong{display:block;font-size:13px;color:#f7fbff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:33vw}.hud-title small{display:block;margin-top:4px;color:#9ab4cb;font-size:11px}
+.hud-actions{display:flex;gap:7px;align-items:center;flex:none}.hud-btn{border:1px solid #59708763;background:#263c50b3;color:#eaf6ff;min-height:38px;min-width:38px;padding:7px 11px;border-radius:10px;display:inline-flex;align-items:center;justify-content:center;gap:7px;font-weight:670;font-size:12px;transition:background .15s,border-color .15s;white-space:nowrap}
+.hud-btn:hover{background:#3c5971;border-color:#83bdce}.hud-btn:disabled{opacity:.4}.hud-btn:focus-visible{outline:2px solid #60e4ff;outline-offset:2px}.hud-btn.accent{background:#146074bd;border-color:#3ac6df99}.hud-btn.is-on{background:#255d5c;border-color:#65e2c9;color:#baffef}.hud-btn.is-muted{background:#51323c;border-color:#b16d80;color:#ffbac8}
+.stage.cinema-mode .hud-bottom{padding:12px 14px 14px}
+.hud-caption{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:9px;color:#acc8dc;font-size:11px;font-weight:700;letter-spacing:.45px;text-transform:uppercase}.hud-caption-note{color:#7795a9;font-weight:450;text-transform:none;letter-spacing:normal;font-size:11px}
+.hud-mix{display:flex;align-items:center;gap:13px}.hud-master{display:flex;align-items:center;gap:8px;flex:0 0 227px;padding-right:13px;border-right:1px solid #48607884}.hud-master input[type=range]{width:85px;min-width:0;accent-color:#50d8ed}.hud-master-value{color:#a5bed2;font-size:11px;font-variant-numeric:tabular-nums;min-width:32px;text-align:right}
+.hud-channels{display:flex;gap:8px;flex:1;min-width:0;overflow-x:auto;overscroll-behavior-x:contain;padding:3px 0 7px;scrollbar-width:thin;scrollbar-color:#546d86 transparent}.hud-channel{display:flex;align-items:center;gap:8px;flex:none;min-width:145px;max-width:235px;border:1px solid #4963787d;background:#1e3043a8;border-radius:11px;padding:5px 7px}.hud-channel.is-main{border-color:#4bd5e795}.hud-channel-name{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#daeaf6;font-size:11px;font-weight:650}.hud-channel small{display:block;font-size:9px;color:#77b7cd;text-transform:uppercase;margin-bottom:3px;letter-spacing:.5px}.hud-channel .hud-btn{min-width:35px;min-height:35px;padding:5px;font-size:16px}
+.stage.cinema-mode .cinema-drawer{display:flex;position:absolute;z-index:2050;top:94px;right:clamp(12px,2vw,28px);bottom:113px;width:min(395px,calc(100% - 24px));background:#0d1927f7;color:#e8f5ff;border:1px solid #527088;border-radius:16px;box-shadow:0 22px 100px #000c;backdrop-filter:blur(28px);-webkit-backdrop-filter:blur(28px);flex-direction:column;overflow:hidden;opacity:0;transform:translateX(12px);visibility:hidden;pointer-events:none;transition:opacity .18s ease,transform .18s ease,visibility 0s linear .18s}
+.stage.cinema-mode .cinema-drawer.is-open{opacity:1;transform:none;visibility:visible;pointer-events:auto;transition:opacity .18s ease,transform .18s ease}
+.cinema-drawer-head{padding:17px 18px 13px;display:flex;align-items:flex-start;justify-content:space-between;border-bottom:1px solid #4053688a;gap:15px}.cinema-drawer-head strong{display:block;font-size:16px;letter-spacing:-.3px}.cinema-drawer-head small{display:block;color:#9bafc2;margin-top:5px;font-size:11px}.cinema-drawer-head .hud-btn{min-width:34px;min-height:34px;padding:5px}
+.cinema-drawer-list{flex:1;min-height:0;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:10px;scrollbar-width:thin;scrollbar-color:#56768d transparent}.cinema-drawer-footer{padding:12px 14px;border-top:1px solid #4053688a;display:flex;gap:8px;justify-content:space-between;align-items:center}.cinema-drawer-footer .hud-btn{font-size:11px;min-height:33px}
+.cinema-source{padding:12px;background:#15293b;border:1px solid #435c7380;border-radius:12px}.cinema-source.is-main{border-color:#3ecdd6a6;background:#143443}.cinema-source-head{display:flex;align-items:center;gap:8px;margin-bottom:10px}.cinema-source-name{min-width:0;flex:1;font-weight:720;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px}.cinema-tag{font-size:9px;font-weight:760;color:#86dce8;background:#193b49;padding:4px 7px;border-radius:6px;border:1px solid #3a7784}.cinema-tag.off{color:#ffb1bd;background:#42232c;border-color:#874451}
+.cinema-row{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:8px}.cinema-row .hud-btn{font-size:11px;min-height:32px;min-width:32px;padding:5px 8px;border-radius:8px}.cinema-row .hud-btn.source-delete{margin-left:auto}.cinema-row label{font-size:10px;color:#aac2d7;white-space:nowrap}.cinema-row input[type=range]{flex:1;min-width:55px;max-width:190px;accent-color:#49d5ee}.cinema-row output{width:32px;color:#a6c0d2;font-size:11px;text-align:right}.cinema-row .hud-btn.corner-btn{font-size:17px;padding:4px 9px}.cinema-source-tip{color:#819bad;font-size:10px;margin-top:7px}
+.stage.cinema-mode .overlay{transition:border-color .18s,box-shadow .18s}
+.stage.cinema-mode .overlay-label{left:6px;top:6px;font-size:10px;max-width:calc(100% - 100px)}
+/* Put overlay controls halfway down its right edge so top/bottom fullscreen docks do not cover them. */
+.stage.cinema-mode .overlay-controls{right:6px;top:50%;transform:translateY(-50%);flex-direction:column;gap:5px}
+.stage.cinema-mode .overlay-controls button{min-width:30px;min-height:29px;padding:4px 5px;font-size:14px;background:#0b1726ed;backdrop-filter:blur(10px);border-color:#aacbda90}
+.stage.cinema-mode .resizer{width:36px;height:36px;opacity:0;background:linear-gradient(135deg,transparent 52%,#8be5f8 53%,#8be5f8 62%,transparent 63%,transparent 73%,#8be5f8 74%,#8be5f8 83%,transparent 84%)}
+.stage.cinema-mode:not(.cinema-idle) .overlay:hover,.stage.cinema-mode .overlay.dragging{border:2px solid #7deaffd0!important;border-radius:10px!important;box-shadow:0 0 0 1px #053d4a,0 10px 35px #000b!important}
+.stage.cinema-mode:not(.cinema-idle) .overlay:hover .overlay-label,.stage.cinema-mode:not(.cinema-idle) .overlay:hover .overlay-controls,.stage.cinema-mode:not(.cinema-idle) .overlay:hover .resizer,.stage.cinema-mode .overlay.dragging .resizer{opacity:1!important}
+.stage.cinema-mode.cinema-idle .overlay-label,.stage.cinema-mode.cinema-idle .overlay-controls,.stage.cinema-mode.cinema-idle .resizer{opacity:0!important;pointer-events:none}
+.stage.cinema-mode.cinema-idle .overlay{border:0!important;border-radius:0!important;box-shadow:none!important}
+.stage.cinema-mode:not(.cinema-idle) .overlay{border:2px solid #ffffff28!important;border-radius:10px!important;box-shadow:0 7px 28px #0009!important}
+.stage.cinema-mode .overlay.dragging{z-index:998!important}
+.stage.cinema-mode .overlay:focus-within{outline:2px solid #63dfff}
+.stage.cinema-mode .overlay-controls,.stage.cinema-mode .overlay-label{z-index:5}
+.stage.cinema-mode .resizer{z-index:6}
+@media(max-width:680px){.stage.cinema-mode .cinema-hud{padding:9px}.stage.cinema-mode .hud-top{min-height:48px;padding:6px;gap:4px}.hud-logo{width:28px;height:28px;font-size:16px}.hud-brand{gap:6px}.hud-title strong{font-size:11px;max-width:23vw}.hud-title small,.hud-caption-note{display:none!important}.hud-actions{gap:4px}.hud-btn{min-width:32px;min-height:32px;padding:5px 8px;font-size:11px}.hud-top .hud-btn .optional-label{display:none}.stage.cinema-mode .hud-bottom{padding:7px}.hud-master{flex:0 0 113px;gap:3px;padding-right:6px}.hud-master input[type=range]{width:42px}.hud-master-value{display:none}.hud-caption{margin-bottom:4px}.hud-channel{min-width:102px;max-width:155px;gap:4px}.hud-channel-name{font-size:10px}.stage.cinema-mode .cinema-drawer{top:58px;bottom:90px;right:8px;width:min(335px,calc(100% - 16px))}}
+@media(prefers-reduced-motion:reduce){.stage.cinema-mode .cinema-hud,.stage.cinema-mode .cinema-drawer{transition:none}}
+
+
+/* MosaicCast TV remote-optimized interface. Small setup controls remain available outside fullscreen. */
+.tv-toolbar{display:flex;align-items:center;gap:12px;justify-content:space-between;flex-wrap:wrap;padding:10px 12px;border:1px solid #2c4862;border-radius:13px;background:linear-gradient(125deg,#10253a,#0b1826)}
+.tv-toolbar-group{display:flex;flex-wrap:wrap;align-items:center;gap:6px}.tv-toolbar-label{font-weight:800;color:#80a1b9;font-size:10px;letter-spacing:1.1px;margin-right:3px}.tv-choice{font-size:12px!important;padding:9px 13px!important;min-height:39px}.tv-choice.active{border-color:#6de9f3!important;color:#dcfbff!important;background:#1b5063!important;box-shadow:inset 0 0 0 1px #61ccd755}.tv-toolbar-end{margin-left:auto}.tv-signal{color:#9bb4c7;font-size:10px}.stage.tv-view{--tv-glow:#70e7ff}.stage.tv-view:focus{outline:none}
+/* Grid uses the source video as a tile; capture elements remain alive and play audio independent of placement. */
+.stage.grid-view{display:grid;grid-template-columns:repeat(var(--grid-columns,2),minmax(0,1fr));grid-template-rows:repeat(var(--grid-rows,1),minmax(0,1fr));gap:5px;background:#080e15;padding:5px}
+.stage.grid-view .stage-main{position:relative;inset:auto;overflow:hidden;min-width:0;min-height:0;background:#000;border-radius:5px;z-index:1}
+.stage.grid-view .stage-overlays{display:contents}
+.stage.grid-view .overlay,.stage.grid-view:fullscreen .overlay{position:relative!important;inset:auto!important;left:auto!important;top:auto!important;width:auto!important;height:auto!important;min-width:0;min-height:0;border:0!important;border-radius:5px!important;box-shadow:none!important;cursor:default!important;z-index:1!important;touch-action:auto}
+.stage.grid-view .overlay video,.stage.grid-view .stage-main video{width:100%;height:100%;position:absolute;inset:0;object-fit:contain;pointer-events:none;background:#000}
+.stage.grid-view .overlay:after,.stage.grid-view .resizer,.stage.grid-view .overlay-controls{display:none!important}
+.stage.grid-view .overlay-label,.stage.grid-view:fullscreen .overlay-label,.stage.grid-view.cinema-idle .overlay-label{display:block;position:absolute;z-index:4;left:13px;bottom:12px;top:auto;background:#071424d9;border-color:#ffffff38;border-radius:7px;font-size:clamp(10px,1vw,15px);padding:7px 10px;opacity:1!important;pointer-events:none;max-width:calc(100% - 24px)}
+.stage.grid-view .tv-main-tag{display:block}.tv-main-tag{display:none;position:absolute;left:13px;bottom:12px;color:#fff;z-index:5;padding:7px 10px;font-size:clamp(10px,1vw,15px);font-weight:800;background:#071424d9;border:1px solid #ffffff38;border-radius:7px;max-width:calc(100% - 24px);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.stage.grid-view .tv-selected,.stage.grid-view:fullscreen .tv-selected,.stage.grid-view.cinema-idle .tv-selected{outline:4px solid var(--tv-glow,#70e7ff)!important;outline-offset:-4px;box-shadow:inset 0 0 0 3px #051018,0 0 25px #20b5ef70!important;z-index:4!important;border-radius:5px!important}
+.stage.focus-view .stage-overlays{display:none}
+.stage.focus-view .stage-main{inset:0}.stage.focus-view .stage-main video{object-fit:contain}
+.stage.focus-view .tv-main-tag{display:block}
+.stage.pip-view .tv-selected{outline:3px solid #7ce7ff!important;outline-offset:-2px}
+/* TV overlay: intentionally high contrast, larger targets, and fade when watching. */
+.stage .tv-osd{display:none}.stage.tv-view .tv-osd{display:flex;position:absolute;z-index:2100;inset:0;flex-direction:column;justify-content:space-between;pointer-events:none;padding:clamp(10px,1.55vw,24px)}
+.tv-osd-top{display:flex;align-items:center;gap:13px;max-width:100%;padding:10px 14px;border:1px solid #4b7b94b0;border-radius:14px;background:#071522e8;backdrop-filter:blur(20px);box-shadow:0 8px 30px #000a;transition:opacity .28s,transform .28s;pointer-events:none}
+.tv-osd-logo{font-size:26px;color:#67dff3;font-weight:800}.tv-osd-current{flex:1;min-width:0}.tv-osd-current strong{font-size:clamp(13px,1.3vw,19px);display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.tv-osd-current small{display:block;color:#b0c7da;font-size:clamp(10px,.8vw,13px);margin-top:4px}.tv-osd-count{font-size:12px;font-weight:750;color:#96cee6;white-space:nowrap}
+.tv-osd-bottom{border:1px solid #4b7b94b0;border-radius:16px;background:#071522ed;backdrop-filter:blur(24px);padding:12px 14px;box-shadow:0 9px 35px #000d;transition:opacity .28s,transform .28s;pointer-events:auto}
+.tv-osd-guide{color:#a5c4d8;font-weight:750;font-size:clamp(10px,.77vw,13px);letter-spacing:.35px;text-align:center;margin-bottom:10px}.tv-osd-actions{display:flex;gap:9px;align-items:center;justify-content:center;flex-wrap:wrap}
+.tv-action{background:#203a51e8;color:#e7f8ff;border:1px solid #65849c;min-height:45px;min-width:45px;padding:8px 14px;border-radius:10px;font-size:clamp(12px,.95vw,15px);font-weight:800;cursor:pointer}.tv-action:hover,.tv-action:focus-visible{background:#2f6076;outline:2px solid #73edff;outline-offset:1px}.tv-action:disabled{opacity:.42}.tv-action.accent{background:#1d6978;border-color:#72e5f5;color:#dfffff}.tv-osd-volume{min-width:95px;max-width:190px;flex:1;display:flex;flex-direction:column;align-items:center;gap:4px}.tv-osd-volume span{font-size:9px;color:#9cbacd;font-weight:800;letter-spacing:.6px}.tv-osd-volume strong{font-size:16px;font-variant-numeric:tabular-nums}.tv-meter{height:5px;border-radius:20px;background:#355069;width:100%;overflow:hidden}.tv-meter #tvVolumeFill{display:block;height:100%;width:100%;background:#62dcf0;transition:width .08s}.stage.tv-osd-idle .tv-osd-top{opacity:0;transform:translateY(-12px);pointer-events:none}.stage.tv-osd-idle .tv-osd-bottom{opacity:0;transform:translateY(15px);pointer-events:none}
+.stage.tv-view .cinema-hud{display:none!important}.stage.tv-view .cinema-drawer{z-index:2150;top:80px;bottom:100px}
+.stage.tv-view .cinema-drawer.is-open~.tv-osd{opacity:0}
+.tv-master-row{padding:14px;border-top:1px solid #4053688a;display:flex;flex-direction:column;gap:8px}.tv-master-row label{font-size:12px;font-weight:750;color:#cae6f2;display:flex;justify-content:space-between}.tv-master-row input{width:100%;accent-color:#65e3f7}
+.stage.tv-view:not(.grid-view) .tv-main-tag{display:block}
+.stage.tv-view .tv-selected{box-shadow:inset 0 0 0 2px #70e7ff}
+.stage.tv-osd-idle.grid-view .tv-selected{outline-color:#56b8ce77!important;box-shadow:none!important}
+.stage.tv-view .overlay-label,.stage.tv-view.cinema-idle .overlay-label{opacity:1}
+body.pip-host .stage.grid-view{width:100vw;height:100vh;aspect-ratio:auto}
+@media(max-width:850px){.tv-toolbar{gap:8px}.tv-toolbar-end{margin-left:0}.tv-osd-actions{gap:5px}.tv-action{min-height:36px;min-width:36px;padding:6px 9px}.tv-osd-bottom{padding:7px}.tv-osd-guide{display:none}.tv-osd-volume{min-width:60px}.tv-osd-top{padding:7px}}
+@media(prefers-reduced-motion:reduce){.tv-osd-top,.tv-osd-bottom,.tv-meter #tvVolumeFill{transition:none}}
+
+</style>
+<style id="pages-custom">a.btn{text-decoration:none} .pages-banner{padding:10px 24px;background:#10273b;border-bottom:1px solid #395975;display:flex;align-items:center;justify-content:space-between;gap:12px;font:600 12px system-ui;color:#c8e9ff}.pages-banner a{color:#84e2ff;text-decoration:underline}.pages-banner span{flex:1}@media(max-width:740px){.pages-banner{font-size:11px;flex-wrap:wrap;padding:9px 12px}}</style></head>
+<body>
+<div class="shell">
+<header class="topbar">
+  <div class="brand"><div class="logo" aria-hidden="true">▣</div><div><div class="brand-name">MosaicCast <span>TV Studio</span></div><div class="brand-small">CHROMECAST-READY STAGE • GRID • PiP • AUDIO MIXER</div></div></div>
+  <div class="top-actions"><div class="live-pill"><span class="dot"></span>Runs locally • Private</div><button id="helpBtn" class="btn sm" title="Instructions and shortcuts">? Help</button><button id="topTV" class="btn sm active" title="Toggle TV remote-friendly controls">▣ TV mode ON</button><button id="topFullscreen" class="btn sm">⛶ Fullscreen</button><button id="topFloat" class="btn primary">▣ Float PiP</button></div>
+</header>
+<div class="pages-banner"><span>WEB STUDIO: capture and arrange streams here. For Mi Box remote control, install the Chromebook extension + TV receiver instead of casting this page.</span><a href="./setup.html">TV setup & downloads →</a></div><div class="workspace">
+<main class="left">
+  <div class="stage-heading"><div><h1>Multi-stream TV stage</h1><div class="muted">Grid, full-screen focus, or movable PiP. Navigate streams with remote-style keys.</div></div><div class="heading-actions"><button class="btn secondary" id="addScreen">⊞ Share tab / screen</button><button class="btn" id="addFiles">＋ Add videos</button><button class="btn" id="addDemo" title="Add an animated demo feed">◉ Demo</button></div></div>
+  <div class="tv-toolbar" id="tvToolbar" aria-label="TV studio quick settings">
+     <div class="tv-toolbar-group"><span class="tv-toolbar-label">LAYOUT</span><button type="button" class="btn tv-choice" data-tv-layout="grid">▦ Grid</button><button type="button" class="btn tv-choice" data-tv-layout="pip">▣ PiP</button><button type="button" class="btn tv-choice" data-tv-layout="focus">▢ Focus</button></div>
+     <div class="tv-toolbar-group"><span class="tv-toolbar-label">SOUND</span><button type="button" class="btn tv-choice" id="tvSoloBtn">◉ Selected only</button><button type="button" class="btn tv-choice" id="tvMixBtn">♫ Mix all</button></div>
+     <div class="tv-toolbar-group tv-toolbar-end"><button type="button" class="btn tv-choice" id="tvFullscreenBtn">⛶ Watch on TV</button><span class="tv-signal" id="remoteIndicator">Keyboard / remote ready*</span></div>
+  </div>
+  <div class="stage-frame" id="stageFrame"><div id="stageMount"><div id="stage" class="stage" aria-label="Video stage"><div id="mainLayer" class="stage-main" data-tile="main"></div><div id="overlayLayer" class="stage-overlays"></div><div id="emptyStage" class="stage-empty"><div><div class="empty-symbol">▣</div><h2>Your main video goes here</h2><p>Add a <strong>tab, window, screen, or local video</strong>.<br>Use Grid to show all streams, or PiP to layer them.</p></div></div>
+<!-- TV OSD stays INSIDE the stage in fullscreen and Document PiP. -->
+<div class="tv-osd" id="tvOsd" aria-label="Android TV style on-screen controls">
+  <div class="tv-osd-top"><span class="tv-osd-logo">▣</span><div class="tv-osd-current"><strong id="tvSelectedName">No stream selected</strong><small id="tvSelectedStatus">Add a tab, screen, or video file</small></div><div class="tv-osd-count" id="tvCount">0 streams</div></div>
+  <div class="tv-osd-bottom" id="tvOsdBottom">
+   <div class="tv-osd-guide" id="tvOsdGuide">ARROWS: select · OK: pause / resume · +/-: volume · M: mute · A: mix · C: fit/fill</div>
+   <div class="tv-osd-actions">
+    <button type="button" class="tv-action accent" id="tvPlay" title="OK / Enter: play/pause selected">▶ Play / Pause</button>
+    <button type="button" class="tv-action" id="tvVolDown" title="Reduce selected volume">−</button><div class="tv-osd-volume"><span id="tvAudioTitle">SELECTED VOLUME</span><strong id="tvVolumeLabel">100%</strong><div class="tv-meter"><span id="tvVolumeFill"></span></div></div><button type="button" class="tv-action" id="tvVolUp" title="Increase selected volume">＋</button>
+    <button type="button" class="tv-action" id="tvMute" title="Mute selected (M)">♫</button><button type="button" class="tv-action" id="tvModeToggle" title="Switch selected/mix audio (A)">◉ Solo</button><button type="button" class="tv-action" id="tvGridToggle" title="Toggle grid/focus (G)">▦ Grid</button><button type="button" class="tv-action" id="tvFit" title="Toggle no-crop Fit / screen-filling Fill (C)">▣ Fill</button><button type="button" class="tv-action" id="tvMixer" title="Source mixer (H)">☷ Mixer</button>
+   </div>
+  </div>
+</div>
+<!-- Cinema HUD is part of the stage, so it remains available in fullscreen and Document PiP. -->
+<div id="cinemaHud" class="cinema-hud" aria-label="Fullscreen player controls">
+ <div class="hud-top" id="hudTop">
+  <div class="hud-brand"><div class="hud-logo" aria-hidden="true">▣</div><div class="hud-title"><strong id="hudStageName">MosaicCast</strong><small><span id="hudSourceCount">0 sources</span> · Move your mouse for controls</small></div></div>
+  <div class="hud-actions">
+   <button type="button" class="hud-btn" id="hudShare" title="Share another tab, window or screen">＋ <span class="optional-label">Share</span></button>
+   <button type="button" class="hud-btn accent" id="hudManage" aria-expanded="false" title="Manage all sources (H)">☷ <span class="optional-label">Sources</span></button>
+   <button type="button" class="hud-btn" id="hudPin" aria-pressed="false" title="Keep these controls visible">♧ <span class="optional-label">Pin</span></button>
+   <button type="button" class="hud-btn" id="hudExit" title="Exit fullscreen or close floating PiP">⛶ <span class="optional-label">Exit</span></button>
+  </div>
+ </div>
+ <div class="hud-bottom" id="hudBottom">
+  <div class="hud-caption"><span>Live audio mixer</span><span class="hud-caption-note">Drag a video to move it · Hover for resize &amp; mute</span></div>
+  <div class="hud-mix"><div class="hud-master"><button type="button" class="hud-btn" id="hudMasterMute" title="Mute/unmute everything (M)">♪</button><input id="hudMasterVolume" type="range" min="0" max="100" value="80" aria-label="Master volume"><span class="hud-master-value" id="hudMasterValue">80%</span></div><div class="hud-channels" id="hudChannels" aria-label="Individual source audio controls"></div></div>
+ </div>
+</div>
+<aside id="cinemaDrawer" class="cinema-drawer" aria-hidden="true" aria-label="Video source manager" inert>
+ <div class="cinema-drawer-head"><div><strong>Source manager</strong><small>Volume, visibility, size &amp; placement</small></div><button id="hudCloseDrawer" class="hud-btn" type="button" title="Close source manager">✕</button></div>
+ <div class="cinema-drawer-list" id="cinemaDrawerList"></div>
+ <div class="tv-master-row"><label for="tvDrawerMaster">Master cast output <strong id="tvDrawerMasterLabel">80%</strong></label><input id="tvDrawerMaster" type="range" min="0" max="100" value="80" aria-label="Master cast output volume"></div><div class="cinema-drawer-footer"><button type="button" class="hud-btn" id="hudResetAll">↺ Reset layout</button><button type="button" class="hud-btn" id="hudShowAll">◧ Show all</button><button type="button" class="hud-btn accent" id="hudDone">Done</button></div>
+</aside>
+</div></div></div>
+  <div class="stage-bar"><span id="stageTip">TV: arrows select a stream, OK plays/pauses local video or freezes a live preview. +/- adjusts selected volume. Change between Grid, PiP, and Focus above.</span><div class="stage-tools"><button class="btn sm" id="swapFit">▣ Fit: Contain</button><button class="btn sm" id="snapshot">⌁ Snapshot</button><button class="btn sm" id="record">● Record</button></div></div>
+  <div class="guide"><div class="guide-card"><div class="step">01</div><b>Add the main video</b><p>Share a Chrome tab, desktop/window, or select a video file. The first source fills the stage.</p></div><div class="guide-card"><div class="step">02</div><b>Switch Grid / PiP / Focus</b><p>Grid arranges every visible feed into TV tiles. PiP keeps draggable overlays. Focus shows just the main feed.</p></div><div class="guide-card"><div class="step">03</div><b>Use TV remote-style controls</b><p>Fullscreen provides large controls, keyboard/D-pad navigation, and selected or mixed audio. Float PiP makes the stage an always-on-top window when Chrome supports it.</p></div></div>
+</main>
+<aside class="right">
+  <section><div class="section-title">LIVE SOURCES <span class="count" id="sourceCount">0 / 12</span></div><div id="sourceList" class="source-list"><div class="source-empty">No sources yet.<br>Use <strong>Share tab / screen</strong> or <strong>Add videos</strong> above.</div></div></section>
+  <section><div class="section-title">PLAYBACK &amp; AUDIO</div><div class="settings">
+    <label class="check"><input id="captureAudio" type="checkbox" checked> Request audio when sharing a tab/screen</label><label class="check"><input id="muteNew" type="checkbox" checked> Start new sources muted (recommended)</label>
+    <div class="setting"><label for="masterVolume">Master volume <span id="masterNumber">80%</span></label><div class="global-volume"><button class="btn sm" id="muteAll" title="Mute all audio">♩ Mute</button><input id="masterVolume" type="range" min="0" max="100" value="80"></div></div>
+    <div class="setting"><label for="videoFit">Video scaling</label><select id="videoFit"><option value="contain">Fit entire video (no crop)</option><option value="cover">Fill frame (crop edges)</option></select></div>
+    <div class="setting"><label for="overlayPreset">New overlay position</label><select id="overlayPreset"><option value="tr">Top right</option><option value="tl">Top left</option><option value="br">Bottom right</option><option value="bl">Bottom left</option></select></div>
+    <label class="check"><input id="snapEdges" type="checkbox" checked> Snap overlays to stage edges</label><div class="setting"><label for="hudDelay">Fullscreen controls fade after</label><select id="hudDelay"><option value="2000">2 seconds</option><option value="3000">3 seconds</option><option value="5000">5 seconds</option><option value="0">Never (always visible)</option></select><small>Mouse movement reveals the controls. Controls stay open while you’re managing sources.</small></div>
+  </div></section>
+  <section><div class="section-title">SESSION</div><div class="settings"><div class="status-row"><span>Video feeds</span><span id="streamStatus" class="status-text">0 active</span></div><div class="status-row"><span>Floating window</span><span id="pipStatus" class="status-text">Closed</span></div><div class="status-row"><span>Recording</span><span id="recordStatus" class="status-text">Off</span></div><div class="bottom-actions"><button id="resetPositions" class="btn sm">⤾ Reset overlays</button><button id="closeAll" class="btn sm danger">✕ Close all</button></div></div></section>
+  <section class="shortcuts">TV / keyboard: <span class="kbd">↑↓←→</span> select stream · <span class="kbd">Enter/OK</span> play/pause preview · <span class="kbd">+ / −</span> selected volume · <span class="kbd">A</span> solo/mix · <span class="kbd">C</span> crop/fit · <span class="kbd">G</span> grid/focus · <span class="kbd">H</span> mixer.<br>Keyboard: <span class="kbd">F</span> fullscreen · <span class="kbd">H</span> source manager · <span class="kbd">P</span> float · <span class="kbd">M</span> mute all · <span class="kbd">1–9</span> choose main source. <span class="kbd">Esc</span> exits fullscreen.</section>
+  <section class="smallprint">Chromecast tab mirroring does not normally forward the Android TV hardware remote to this page. TV keyboard controls work only when the receiving application/browser forwards them, or when a remote/keyboard is paired to the sender. Live screen capture can be frozen/muted here, but this cannot pause the original website. Screen share permission is requested separately for each source. No server, login, external dependencies, or uploads. Chrome decides which tabs/windows can share audio. Protected/DRM video may not be capturable. Document PiP availability depends on browser and security settings.</section>
+</aside>
+</div></div>
+<input id="filePicker" type="file" accept="video/*" multiple hidden>
+<video id="classicPipVideo" muted playsinline autoplay style="position:fixed;width:1px;height:1px;opacity:0;pointer-events:none;z-index:-1"></video>
+<div class="notice-stack" id="toasts" role="status" aria-live="polite"></div>
+<div id="helpModal" class="overlay-modal hidden" role="dialog" aria-modal="true" aria-label="Help"><div class="modal"><h2>How PiP Studio works</h2><p><b>Main + overlays:</b> the first source is the main video. New sources float above it, not beside it. Grab any small video to drag; use its bottom-right corner to resize. Double-click to promote it to main. You can also control them from the source list.</p><p><b>Fullscreen:</b> fills the display with the main video and its overlays, with the controls appearing on mouse movement and disappearing when idle. Open Sources (H) to mute, reposition, show/hide, resize, or promote videos. Drag any overlay and resize from its lower-right corner.</p><p><b>Float PiP:</b> Chrome's Document Picture-in-Picture opens one always-on-top window containing the main video and movable overlays. Drag or resize that outer window using Chrome; rearrange inner overlays directly. When unavailable, single composite-video PiP is attempted instead.</p><p><b>Android TV remote:</b> Keyboard or remote events received by the HTML page use arrows to select streams, OK to pause local files or freeze the captured preview, +/- for volume, and A to switch Solo/Mix audio. Chrome Cast tab mirroring normally does not relay Android TV remote button presses to this page. This HTML cannot pause the original shared website; that needs a separately supported browser-extension or Cast receiver integration.</p><p><b>Sources and audio:</b> open each tab or screen through Chrome's sharing prompt and check “Share tab audio” when available. Each source has separate mute and volume controls. Sources must be added again after reloading the page.</p><p><b>Shortcuts:</b> F = fullscreen, H = source manager, P = floating window, M = mute all, 1–9 = make source main, Esc = close manager / exit fullscreen.</p><div class="modal-actions"><button class="btn primary" id="helpClose">Got it</button></div></div></div>
+<script>
+(()=>{'use strict';
+const $=id=>document.getElementById(id)||(pipWindow&&!pipWindow.closed?pipWindow.document.getElementById(id):null);
+const MAX=12;
+const sources=[];
+ let selectedId=null,tvTimer=0,lastTVKey="",tvKeySeen=false;
+let serial=0,mainId=null,pipWindow=null,pipIsClosing=false,classicPip=false,capturePending=false,recorder=null,recordChunks=[],recordStream=null,recordAudioContext=null,recordAudioCleanup=[],drawTimer=0,recordStarted=0,demoCounter=0;
+const canvas=document.createElement('canvas');canvas.width=1280;canvas.height=720;const drawCtx=canvas.getContext('2d',{alpha:false});
+const stage=$('stage'), mainLayer=$('mainLayer'),overlayLayer=$('overlayLayer'),emptyStage=$('emptyStage'),stageMount=$('stageMount');
+const prefs={captureAudio:true,muteNew:false,master:80,masterMuted:false,fit:'cover',preset:'tr',snap:true,hudDelay:3000,layout:'grid',audioMode:'solo',tvMode:true};
+try{Object.assign(prefs,JSON.parse(localStorage.getItem('mosaiccast.pip.prefs')||'{}'))}catch{}
+const save=()=>{try{localStorage.setItem('mosaiccast.pip.prefs',JSON.stringify(prefs))}catch{}};
+const formatTime=sec=>{if(!Number.isFinite(sec))return '--:--';sec=Math.max(0,Math.floor(sec));return Math.floor(sec/60)+':'+String(sec%60).padStart(2,'0')};
+const clamp=(v,min,max)=>Math.min(max,Math.max(min,v));
+const sById=id=>sources.find(s=>s.id===id);
+ const shown=()=>{const main=sById(mainId);return [main,...sources.filter(s=>s.id!==mainId&&!s.hidden)].filter(Boolean)};
+ const tvSelected=()=>sById(selectedId)||sById(mainId)||sources[0]||null;
+ const gridColumns=n=>n<=1?1:n<=4?2:n<=9?3:4;
+ const gridRows=n=>Math.ceil(n/gridColumns(n));
+ const isTVPlaying=s=>s.type==='file'?!s.video.paused:!s.frozen;
+
+const toast=(msg,bad=false)=>{const p=document.createElement('div');p.className='toast'+(bad?' bad':'');p.textContent=msg;const b=document.createElement('button');b.textContent='×';b.setAttribute('aria-label','Dismiss');b.onclick=()=>p.remove();p.append(b);$('toasts').prepend(p);setTimeout(()=>p.remove(),7500)};
+const safeError=e=>{if(e?.name==='NotAllowedError'||e?.name==='AbortError')return 'Screen capture was cancelled or denied. Select a source in Chrome’s dialog.';if(e?.name==='NotFoundError')return 'No capture sources were available.';if(e?.name==='NotReadableError')return 'Chrome could not read that source; try sharing a different tab or window.';if(e?.name==='InvalidStateError')return 'Chrome needs a fresh click on the Share button to start capture.';return e?.message||String(e)};
+function applyPreferences(){ $('captureAudio').checked=!!prefs.captureAudio;$('muteNew').checked=!!prefs.muteNew;$('masterVolume').value=prefs.master;$('masterNumber').textContent=prefs.master+'%';$('videoFit').value=prefs.fit;$('overlayPreset').value=prefs.preset;$('snapEdges').checked=!!prefs.snap;$('hudDelay').value=String([0,2000,3000,5000].includes(Number(prefs.hudDelay))?prefs.hudDelay:3000);$('muteAll').textContent=prefs.masterMuted?'♪ Unmute':'♩ Mute';$('swapFit').textContent=prefs.fit==='contain'?'▣ Fit: Contain':'▣ Fit: Cover';stage.querySelectorAll('video').forEach(v=>v.style.objectFit=prefs.fit);sources.forEach(setAudio);updateCinemaStatus();if(typeof renderTVStatus==='function')renderTVStatus()}
+function setAudio(s){const level=clamp((s.volume/100)*(prefs.master/100),0,1);s.video.volume=level;s.video.muted=!!(s.muted||prefs.masterMuted||level===0||!s.hasAudio||s.frozen||(prefs.audioMode==='solo'&&s.id!==selectedId));if(s.recordGain)s.recordGain.gain.value=s.video.muted?0:level;}
+function makeVideo(){let v=document.createElement('video');v.autoplay=true;v.playsInline=true;v.setAttribute('playsinline','');v.muted=true;v.controls=false;v.style.objectFit=prefs.fit;v.disablePictureInPicture=true;v.preload='auto';return v}
+function overlayPosition(i){const w=.31,h=.315,p=.024;const corner=prefs.preset;let x=corner.endsWith('r')?1-w-p:p,y=corner.startsWith('b')?1-h-p:p;const shift=i%5*.045;x=clamp(x+(corner.endsWith('r')?-shift:shift),0,1-w);y=clamp(y+(corner.startsWith('b')?-shift:shift),0,1-h);return {x,y,w,h}}
+function addSource({type,name,stream=null,file=null,demo=null}){
+  if(sources.length>=MAX){stream?.getTracks().forEach(t=>t.stop());toast('Maximum 12 sources. Remove a source before adding another.',true);return}
+  const id=++serial,video=makeVideo(),hasAudio=stream?stream.getAudioTracks().length>0:type==='file';
+  const s={id,type,name:name||('Source '+id),video,stream,file,demo,hasAudio,muted:!!prefs.muteNew,volume:100,hidden:false,frozen:false,pos:overlayPosition(Math.max(0,sources.length-1)),node:null,recordGain:null};
+  if(stream){video.srcObject=stream;const track=stream.getVideoTracks()[0];if(track){track.addEventListener('ended',()=>{if(sById(id)){removeSource(id);toast('A shared source stopped.')}})} }
+  if(file){s.objectUrl=URL.createObjectURL(file);video.src=s.objectUrl;video.loop=false;video.onloadedmetadata=()=>renderSourceList();video.onended=()=>{renderSourceList();updateTvTiles();renderTVStatus()};video.onplay=()=>{renderSourceList();updateTvTiles();renderTVStatus()};video.onpause=()=>{renderSourceList();updateTvTiles();renderTVStatus()};video.ontimeupdate=()=>{const seek=document.querySelector('[data-seek-for="'+s.id+'"]'),time=document.querySelector('[data-time-for="'+s.id+'"]');if(seek&&document.activeElement!==seek){seek.max=Number.isFinite(video.duration)?video.duration:100;seek.value=video.currentTime||0}if(time)time.textContent=formatTime(video.currentTime)+' / '+formatTime(video.duration)};video.onerror=()=>toast('Unable to decode '+s.name+'. Try a format supported by Chrome.',true)}
+  sources.push(s);if(mainId==null)mainId=id;if(selectedId==null)selectedId=id;
+  setAudio(s);renderStage();renderSourceList();updateStatus();
+  video.play().catch(()=>{if(file)toast('Click Play in the source list to start '+s.name+'.')});
+  toast('Added: '+s.name+(hasAudio?'':' · No audio track'));
+}
+async function addScreen(){if(capturePending)return;if(!navigator.mediaDevices?.getDisplayMedia){toast('Screen sharing is unavailable here. Open this HTML directly in Chrome, or use an HTTPS/localhost page.',true);return}if(sources.length>=MAX){toast('Maximum 12 sources.',true);return}
+ capturePending=true;$('addScreen').disabled=true;let stream;
+ try{stream=await navigator.mediaDevices.getDisplayMedia({video:{frameRate:24},audio:!!prefs.captureAudio,preferCurrentTab:false, selfBrowserSurface:'exclude',surfaceSwitching:'include'});if(!stream.getVideoTracks().length)throw new Error('No video track was shared.');const track=stream.getVideoTracks()[0],label=track.label||'Shared video '+(sources.length+1);addSource({type:'screen',name:label,stream});if(prefs.captureAudio&&!stream.getAudioTracks().length)toast('This capture has no audio. In Chrome, select a tab and enable “Share tab audio” if it is offered.');}
+ catch(e){stream?.getTracks().forEach(t=>t.stop());toast(safeError(e),true)}finally{capturePending=false;$('addScreen').disabled=false}
+}
+function addFiles(files){for(const file of files){if(sources.length>=MAX){toast('Maximum 12 sources.',true);break}if(!file.type.startsWith('video/')&&!/\.(mp4|webm|mkv|mov|ogg|m4v)$/i.test(file.name)){toast('Not recognized as video: '+file.name,true);continue}addSource({type:'file',name:file.name,file})} $('filePicker').value=''}
+function addDemo(){if(sources.length>=MAX){toast('Maximum 12 sources.',true);return}const n=++demoCounter,c=document.createElement('canvas');c.width=960;c.height=540;const x=c.getContext('2d');let raf=0,stopped=false;
+ const hues=[197,277,24,153,345,60],hue=hues[(n-1)%hues.length];
+ function tick(t){if(stopped)return;const W=c.width,H=c.height;let g=x.createLinearGradient(0,0,W,H);g.addColorStop(0,`hsl(${hue} 45% 14%)`);g.addColorStop(.5,`hsl(${hue+20} 52% 25%)`);g.addColorStop(1,'#06111c');x.fillStyle=g;x.fillRect(0,0,W,H);
+ x.strokeStyle=`hsla(${hue+5},85%,75%,.13)`;x.lineWidth=1;for(let q=0;q<11;q++){x.beginPath();x.moveTo(0,q*70);x.lineTo(W,q*70);x.stroke()}for(let q=0;q<15;q++){x.beginPath();x.moveTo(q*70,0);x.lineTo(q*70,H);x.stroke()}
+ const time=t/1000;for(let j=0;j<4;j++){const xx=W*.5+Math.cos(time*(.14+j*.028)+j*1.5)*W*.32,yy=H*.5+Math.sin(time*(.22+j*.02)+j*2)*H*.29,rad=56+j*22;x.beginPath();x.arc(xx,yy,rad,0,Math.PI*2);x.fillStyle=`hsla(${hue+j*22},80%,65%,${.12+j*.04})`;x.fill()}
+ x.textAlign='center';x.fillStyle='#f1fcff';x.font='700 60px system-ui';x.fillText('DEMO '+String(n).padStart(2,'0'),W/2,H/2-2);x.font='400 21px system-ui';x.fillStyle='#c1d7e9';x.fillText('LIVE VIDEO SOURCE  •  ' +new Date().toLocaleTimeString(),W/2,H/2+44);raf=requestAnimationFrame(tick)}
+ tick(performance.now());const stream=c.captureStream(20);addSource({type:'demo',name:'Demo '+String(n).padStart(2,'0'),stream,demo:{stop(){stopped=true;cancelAnimationFrame(raf)}}})}
+function removeSource(id){const s=sById(id);if(!s)return;if(recorder?.state==='recording')stopRecording();s.demo?.stop();s.stream?.getTracks().forEach(t=>t.stop());s.video.pause();s.video.srcObject=null;s.video.removeAttribute('src');s.video.load();s.video.remove();if(s.objectUrl)URL.revokeObjectURL(s.objectUrl);s.node?.remove();sources.splice(sources.indexOf(s),1);if(mainId===id)mainId=sources[0]?.id??null;if(selectedId===id)selectedId=mainId??null;renderStage();renderSourceList();updateStatus()}
+function setMain(id){const next=sById(id);if(!next||id===mainId)return;const prev=sById(mainId);if(prev&&!prev.hidden){prev.pos={...next.pos};}mainId=id;next.hidden=false;selectedId=id;sources.forEach(setAudio);renderStage();renderSourceList();toast(next.name+' is now the main video')}
+function renderStage(){
+  stage.classList.toggle('grid-view',prefs.layout==='grid');
+  stage.classList.toggle('focus-view',prefs.layout==='focus');
+  stage.classList.toggle('pip-view',prefs.layout==='pip');
+  stage.classList.toggle('tv-view',!!prefs.tvMode);
+  const visible=shown();stage.style.setProperty('--grid-columns',gridColumns(visible.length));
+  stage.style.setProperty('--grid-rows',gridRows(visible.length));
+  emptyStage.classList.toggle('hidden',sources.length>0);
+ const main=sById(mainId);if(main&&main.video.parentElement!==mainLayer)mainLayer.append(main.video);
+ if(!main)mainLayer.replaceChildren();
+  else {let tag=$('tvMainTag');if(!tag){tag=document.createElement('div');tag.id='tvMainTag';tag.className='tv-main-tag'}if(tag.parentElement!==mainLayer)mainLayer.append(tag)}
+ for(const s of sources){if(s.id===mainId||s.hidden){s.node?.remove();s.node=null;continue}if(!s.node){s.node=createOverlay(s);overlayLayer.append(s.node)}else if(s.node.parentElement!==overlayLayer)overlayLayer.append(s.node);if(s.video.parentElement!==s.node)s.node.prepend(s.video);updateOverlay(s)}
+ stage.querySelectorAll('video').forEach(v=>v.style.objectFit=prefs.fit);
+  renderCinemaControls();updateTvTiles();renderTVStatus();
+}
+function updateOverlay(s){if(!s.node)return;const n=s.node; n.style.left=(s.pos.x*100)+'%';n.style.top=(s.pos.y*100)+'%';n.style.width=(s.pos.w*100)+'%';n.style.height=(s.pos.h*100)+'%';n.style.zIndex=String(s.id+5);const lab=n.querySelector('.overlay-label');if(lab)lab.textContent=s.name}
+function createOverlay(s){const n=document.createElement('div');n.className='overlay';n.addEventListener('click',e=>{if(prefs.layout==='grid'&&!e.target.closest('button'))selectSource(s.id)});n.dataset.sourceId=s.id;n.setAttribute('role','group');n.setAttribute('aria-label','Move and resize '+s.name);const label=document.createElement('div');label.className='overlay-label';label.textContent=s.name;const controls=document.createElement('div');controls.className='overlay-controls';
+ const promote=document.createElement('button');promote.textContent='↑ MAIN';promote.title='Make the main video';promote.addEventListener('click',e=>{e.stopPropagation();setMain(s.id)});
+ const hide=document.createElement('button');hide.textContent='✕';hide.title='Hide overlay (source stays active)';hide.addEventListener('click',e=>{e.stopPropagation();s.hidden=true;renderStage();renderSourceList()});const mute=document.createElement('button');mute.textContent=s.hasAudio?(s.muted?'♩':'♫'):'−';mute.title=s.hasAudio?'Mute or unmute '+s.name:'No audio track';mute.disabled=!s.hasAudio;mute.className='overlay-mute';mute.addEventListener('click',e=>{e.stopPropagation();toggleSourceAudio(s)});promote.textContent='↑';promote.title='Make '+s.name+' the main video';hide.textContent='✕';controls.append(mute,promote,hide);
+ const grip=document.createElement('div');grip.className='resizer';grip.dataset.grip='yes';grip.title='Drag to resize';n.append(label,controls,grip);
+ n.addEventListener('pointerdown',e=>startDrag(e,s));n.addEventListener('dblclick',e=>{if(e.target.closest('button'))return;setMain(s.id)});
+ n.addEventListener('wheel',e=>{if(!e.ctrlKey)return;e.preventDefault();const step=e.deltaY<0?.03:-.03;changeOverlaySize(s,step)}, {passive:false});return n}
+function changeOverlaySize(s,delta){let aspect=s.pos.w/s.pos.h;const w=clamp(s.pos.w+delta,.13,.88);s.pos.w=w;s.pos.h=clamp(w/aspect,.12,.88);s.pos.x=clamp(s.pos.x,0,1-s.pos.w);s.pos.y=clamp(s.pos.y,0,1-s.pos.h);updateOverlay(s)}
+function snap(n,limit){if(!prefs.snap)return n;const threshold=.018;return Math.abs(n)<threshold?0:Math.abs(n-limit)<threshold?limit:n}
+function startDrag(e,s){if(e.button!==0||e.target.closest('button'))return;const n=s.node;if(!n)return;e.preventDefault();const rect=stage.getBoundingClientRect(),startX=e.clientX,startY=e.clientY,initial={...s.pos};const nr=n.getBoundingClientRect();const resize=e.target.dataset.grip==='yes'||(e.clientX>nr.right-20&&e.clientY>nr.bottom-20);let dragged=false;
+ n.classList.add('dragging');stage.classList.add('cinema-dragging');revealCinema();n.setPointerCapture?.(e.pointerId);
+ const move=ev=>{const dx=(ev.clientX-startX)/rect.width,dy=(ev.clientY-startY)/rect.height;if(Math.abs(ev.clientX-startX)+Math.abs(ev.clientY-startY)>2)dragged=true;if(resize){const w=clamp(initial.w+dx,.13,Math.min(.9,1-initial.x));const h=clamp(initial.h+dy,.12,Math.min(.9,1-initial.y));s.pos.w=snap(w,1-initial.x);s.pos.h=snap(h,1-initial.y)}else{s.pos.x=snap(clamp(initial.x+dx,0,1-initial.w),1-initial.w);s.pos.y=snap(clamp(initial.y+dy,0,1-initial.h),1-initial.h)}updateOverlay(s)};
+ const end=()=>{stage.classList.remove('cinema-dragging');revealCinema();n.classList.remove('dragging');n.removeEventListener('pointermove',move);n.removeEventListener('pointerup',end);n.removeEventListener('pointercancel',end);if(dragged){n.dataset.dragged='1';setTimeout(()=>delete n.dataset.dragged,250)}};
+ n.addEventListener('pointermove',move);n.addEventListener('pointerup',end);n.addEventListener('pointercancel',end);
+}
+
+// The entire cinema layer stays inside the stage: browser fullscreen and Document PiP retain it.
+let cinemaTimer=0,cinemaPinned=false,cinemaManagerOpen=false;
+function revealCinema(){
+ if(!stage.classList.contains('cinema-mode'))return;
+ stage.classList.remove('cinema-idle');clearTimeout(cinemaTimer);
+ if(!cinemaPinned&&!cinemaManagerOpen&&prefs.hudDelay!==0)cinemaTimer=setTimeout(hideCinema,Number(prefs.hudDelay)||3000);
+}
+function hideCinema(){
+ if(!stage.classList.contains('cinema-mode')||cinemaPinned||cinemaManagerOpen||stage.classList.contains('cinema-dragging'))return;
+ // Mouse hovering alone is not activity: even a resting cursor over controls should fade.
+ // Only an active drag/slider gesture keeps controls visible.
+ if(stage.classList.contains('cinema-interacting')){cinemaTimer=setTimeout(hideCinema,800);return;}
+ stage.classList.add('cinema-idle');
+}
+function syncCinemaMode(){
+ const active=stage.ownerDocument.fullscreenElement===stage || !!(pipWindow&&!pipWindow.closed&&stage.ownerDocument===pipWindow.document);
+ stage.classList.toggle('cinema-mode',active);
+ if(!active){clearTimeout(cinemaTimer);stage.classList.remove('cinema-idle','cinema-dragging');cinemaManagerOpen=false;stage.classList.remove('cinema-managing');}
+ updateCinemaStatus();
+ if(active){revealCinema();revealTV()}else updateCinemaManager();
+}
+function updateCinemaStatus(){
+ const main=sById(mainId);
+ $('hudStageName').textContent=main?.name||'MosaicCast · No main source';
+ $('hudSourceCount').textContent=sources.length+' source'+(sources.length===1?'':'s');
+ $('hudMasterMute').textContent=prefs.masterMuted||!prefs.master?'♪̸':'♫';
+ $('hudMasterMute').classList.toggle('is-muted',!!prefs.masterMuted);
+ $('hudMasterMute').title=prefs.masterMuted?'Unmute all sources (M)':'Mute all sources (M)';
+ $('hudMasterVolume').value=prefs.master;
+ $('hudMasterValue').textContent=prefs.master+'%';
+ $('hudPin').classList.toggle('is-on',cinemaPinned||prefs.hudDelay===0);
+ $('hudPin').setAttribute('aria-pressed',String(cinemaPinned||prefs.hudDelay===0));
+ $('hudPin').title=cinemaPinned?'Allow controls to fade again':'Keep controls visible';
+ $('hudExit').title=pipWindow&&!pipWindow.closed?'Close floating PiP window':'Exit fullscreen';
+ $('hudExit').querySelector('.optional-label').textContent=pipWindow&&!pipWindow.closed?'Close PiP':'Exit';
+ $('hudShare').disabled=!!capturePending||sources.length>=MAX;
+ if(stage.classList.contains('cinema-mode')&&prefs.hudDelay===0)stage.classList.remove('cinema-idle');
+}
+function toggleSourceAudio(s){
+ if(!s||!s.hasAudio)return;
+ s.muted=!s.muted;setAudio(s);renderSourceList();renderTVStatus();revealCinema();revealTV();
+}
+function toggleMasterAudio(){prefs.masterMuted=!prefs.masterMuted;save();applyPreferences();renderSourceList();revealCinema()}
+function setCinemaManager(open){
+ cinemaManagerOpen=!!open&&stage.classList.contains('cinema-mode');
+ updateCinemaManager();revealCinema();
+}
+function updateCinemaManager(){
+ const drawer=$('cinemaDrawer');drawer.classList.toggle('is-open',cinemaManagerOpen);
+ drawer.inert=!cinemaManagerOpen;
+ drawer.setAttribute('aria-hidden',String(!cinemaManagerOpen));
+ $('hudManage').setAttribute('aria-expanded',String(cinemaManagerOpen));
+ $('hudManage').classList.toggle('is-on',cinemaManagerOpen);
+ if(!cinemaManagerOpen&&drawer.contains(stage.ownerDocument.activeElement))$('hudManage').focus();
+}
+function cinemaButton(label,title,action,classNames=''){const b=document.createElement('button');b.type='button';b.className='hud-btn '+classNames;b.textContent=label;b.title=title;b.setAttribute('aria-label',title);b.addEventListener('click',e=>{e.stopPropagation();action();revealCinema()});return b}
+function setOverlayCorner(s,corner){
+ if(!s||s.id===mainId)return;
+ const p=.018;
+ s.pos.x=corner.endsWith('r')?1-s.pos.w-p:p;
+ s.pos.y=corner.startsWith('b')?1-s.pos.h-p:p;
+ s.pos.x=clamp(s.pos.x,0,1-s.pos.w);s.pos.y=clamp(s.pos.y,0,1-s.pos.h);updateOverlay(s);revealCinema();
+}
+function renderCinemaControls(){
+ const channels=$('hudChannels'),list=$('cinemaDrawerList');
+ if(!channels||!list)return;
+ // Don't destroy the volume slider being dragged. Render is only invoked after discrete changes.
+ channels.replaceChildren();list.replaceChildren();
+ if(!sources.length){const note=document.createElement('div');note.className='cinema-source-tip';note.textContent='No sources yet. Click Share to capture a tab or screen.';list.append(note)}
+ sources.forEach((s,i)=>{
+  const chip=document.createElement('div');chip.className='hud-channel'+(s.id===mainId?' is-main':'');
+  const name=document.createElement('div');name.className='hud-channel-name';const cap=document.createElement('small');cap.textContent=s.id===mainId?'MAIN':s.hidden?'HIDDEN':'PiP';const label=document.createElement('span');label.textContent=s.name;name.append(cap,label);
+  const mute=cinemaButton(s.hasAudio?(s.muted?'♪̸':'♫'):'−',s.hasAudio?'Mute / unmute '+s.name:s.name+' has no audio',()=>toggleSourceAudio(s),s.muted?'is-muted':'');mute.disabled=!s.hasAudio;
+  chip.append(name,mute);channels.append(chip);
+  const card=document.createElement('div');card.className='cinema-source'+(s.id===mainId?' is-main':'');const hd=document.createElement('div');hd.className='cinema-source-head';const title=document.createElement('span');title.className='cinema-source-name';title.textContent=(i+1)+'. '+s.name;title.title=s.name;
+  const role=document.createElement('span');role.className='cinema-tag';role.textContent=s.id===mainId?'MAIN':s.hidden?'HIDDEN':'PiP';hd.append(title,role);card.append(hd);
+  const row=document.createElement('div');row.className='cinema-row';
+  const main=cinemaButton('↑ Main','Make '+s.name+' the main video',()=>setMain(s.id));main.disabled=s.id===mainId;row.append(main);
+  const show=cinemaButton(s.hidden?'◉ Show':'◉ Hide',s.hidden?'Show '+s.name:'Hide '+s.name,()=>{s.hidden=!s.hidden;renderStage();renderSourceList()});show.disabled=s.id===mainId;row.append(show);
+  const muteBtn=cinemaButton(s.hasAudio?(s.muted?'♪ Unmute':'♫ Mute'):'No audio',s.hasAudio?'Toggle '+s.name+' audio':'No audio track',()=>toggleSourceAudio(s),s.muted?'is-muted':'');muteBtn.disabled=!s.hasAudio;row.append(muteBtn);
+  const del=cinemaButton('✕','Stop and remove '+s.name,()=>removeSource(s.id),'source-delete');row.append(del);card.append(row);
+  if(s.hasAudio){const volumeRow=document.createElement('div');volumeRow.className='cinema-row';const volumeText=document.createElement('label');volumeText.textContent='Volume';const range=document.createElement('input');range.type='range';range.min='0';range.max='100';range.value=s.volume;range.setAttribute('aria-label','Volume of '+s.name);const val=document.createElement('output');val.textContent=s.volume+'%';range.addEventListener('input',()=>{s.volume=Number(range.value);val.textContent=s.volume+'%';setAudio(s)});volumeRow.append(volumeText,range,val);card.append(volumeRow)}
+  if(s.id!==mainId){
+   const sizing=document.createElement('div');sizing.className='cinema-row';const text=document.createElement('label');text.textContent='Size';sizing.append(text,cinemaButton('−','Make '+s.name+' smaller',()=>changeOverlaySize(s,-.045)),cinemaButton('＋','Make '+s.name+' bigger',()=>changeOverlaySize(s,.045)),cinemaButton('↺','Reset size and position',()=>{s.pos=overlayPosition(i);updateOverlay(s)}));
+   const placement=document.createElement('div');placement.className='cinema-row';const where=document.createElement('label');where.textContent='Move to';placement.append(where);for(const [corner,icon] of [['tl','↖'],['tr','↗'],['bl','↙'],['br','↘']])placement.append(cinemaButton(icon,'Move '+s.name+' to '+({tl:'top left',tr:'top right',bl:'bottom left',br:'bottom right'})[corner],()=>setOverlayCorner(s,corner),'corner-btn'));
+   const tip=document.createElement('div');tip.className='cinema-source-tip';tip.textContent='Or drag the PiP directly; pull its bottom-right corner to resize.';card.append(sizing,placement,tip);
+  }
+  if(s.type==='file'){const row=document.createElement('div');row.className='cinema-row';row.append(cinemaButton(s.video.paused?'▶ Play':'❚❚ Pause',s.video.paused?'Play':'Pause',()=>{if(s.video.paused)s.video.play().catch(e=>toast(safeError(e),true));else s.video.pause();renderSourceList()}));card.append(row)}
+  list.append(card);
+ });
+ updateCinemaStatus();updateCinemaManager();
+ // Reflect mute changes in the tiny buttons directly on the floating overlay.
+ for(const s of sources){const b=s.node?.querySelector('.overlay-mute');if(b){b.textContent=s.hasAudio?(s.muted?'♪̸':'♫'):'−';b.disabled=!s.hasAudio;b.title=s.muted?'Unmute '+s.name:'Mute '+s.name}}
+}
+
+// ---- Local remote / keyboard-driven TV control ----------------------------
+// Chrome's regular Cast Tab mirroring does not itself send Android TV key events to this page.
+function revealTV(){
+ if(!prefs.tvMode)return;stage.classList.remove('tv-osd-idle');clearTimeout(tvTimer);
+ if(!cinemaManagerOpen)tvTimer=setTimeout(()=>stage.classList.add('tv-osd-idle'),4800);
+}
+function updateTvTiles(){
+ const active=tvSelected(),main=sById(mainId),mainTag=$('tvMainTag');
+ mainLayer.classList.toggle('tv-selected',!!main&&selectedId===main.id);
+ if(mainTag)mainTag.textContent=main?(main.name+(main.frozen?' · FROZEN':main.type==='file'&&main.video.paused?' · PAUSED':'')):'';
+ for(const s of sources){if(!s.node)continue;s.node.classList.toggle('tv-selected',s.id===selectedId);s.node.classList.toggle('tv-frozen',!!s.frozen);const badge=s.node.querySelector('.overlay-label');if(badge)badge.textContent=s.name+(s.frozen?' · FROZEN':s.type==='file'&&s.video.paused?' · PAUSED':'')}
+}
+function renderTVStatus(){
+ const s=tvSelected(),aud=s?.hasAudio&&!s.muted&&!s.frozen&&!prefs.masterMuted&&(prefs.audioMode==='mix'||s.id===selectedId);
+ $('tvSelectedName').textContent=s?.name||'No selected stream';
+ $('tvSelectedStatus').textContent=!s?'Add a source to begin':(s.type==='file'?(s.video.paused?'Local file paused':'Local file playing'):(s.frozen?'Capture preview frozen — original site keeps playing':'Live capture — OK freezes preview, not original site'))+' · '+(s.hasAudio?(aud?'Audio enabled':'Audio muted'):'No audio captured');
+ $('tvCount').textContent=sources.length+' stream'+(sources.length===1?'':'s');
+ $('tvVolumeLabel').textContent=s?.hasAudio?s.volume+'%':'N/A';
+ $('tvVolumeFill').style.width=s?.hasAudio?s.volume+'%':'0%';
+ $('tvPlay').textContent=!s?'▶ Play / Pause':(isTVPlaying(s)?'❚❚ Pause / Freeze':'▶ Play / Resume');
+ $('tvPlay').disabled=!s;
+ $('tvMute').textContent=s?.muted?'♪ Unmute':'♫ Mute';$('tvMute').disabled=!s||!s.hasAudio;
+ $('tvModeToggle').textContent=prefs.audioMode==='solo'?'◉ Selected':'♫ Mix all';
+ $('tvGridToggle').textContent=prefs.layout==='grid'?'▦ Grid':prefs.layout==='focus'?'▢ Focus':'▣ PiP';$('tvFit').textContent=prefs.fit==='cover'?'▣ Fill':'▢ Fit';
+ $('tvDrawerMaster').value=prefs.master;$('tvDrawerMasterLabel').textContent=prefs.master+'%';
+ $('tvAudioTitle').textContent=prefs.audioMode==='solo'?'SELECTED AUDIO':'CHANNEL VOLUME';
+ $('tvVolUp').disabled=!s?.hasAudio;$('tvVolDown').disabled=!s?.hasAudio;
+ $('tvSoloBtn').classList.toggle('active',prefs.audioMode==='solo');$('tvMixBtn').classList.toggle('active',prefs.audioMode==='mix');
+ document.querySelectorAll('[data-tv-layout]').forEach(b=>b.classList.toggle('active',b.dataset.tvLayout===prefs.layout));
+ $('topTV').textContent=prefs.tvMode?'▣ TV mode ON':'▢ TV mode OFF';$('topTV').classList.toggle('active',!!prefs.tvMode);
+}
+function selectSource(id){const s=sById(id);if(!s)return;selectedId=id;sources.forEach(setAudio);updateTvTiles();renderSourceList();renderTVStatus();revealTV();}
+function setAudioMode(mode){if(!['solo','mix'].includes(mode))return;prefs.audioMode=mode;save();sources.forEach(setAudio);renderSourceList();renderTVStatus();revealTV();toast(mode==='solo'?'Selected audio only. Arrow navigation switches the audio stream.':'Mix all unmuted sources; each keeps its own volume.')}
+function setLayout(mode){if(!['grid','pip','focus'].includes(mode))return;prefs.layout=mode;save();renderStage();renderTVStatus();revealTV()}
+function tvChangeVolume(delta){const s=tvSelected();if(!s||!s.hasAudio){toast('Selected source has no captured audio. Try checking “Share tab audio” when sharing.',true);return}s.volume=clamp(s.volume+delta,0,100);setAudio(s);renderSourceList();renderTVStatus();revealTV()}
+function tvToggleMute(){const s=tvSelected();if(s?.hasAudio)toggleSourceAudio(s);else toast('No captured audio track for this stream.',true);renderTVStatus();revealTV()}
+function tvTogglePlay(){
+ const s=tvSelected();if(!s){toast('Add a source first.');return}
+ if(s.type==='file'){if(s.video.paused){s.video.play().catch(e=>toast(safeError(e),true))}else s.video.pause()}
+ else {s.frozen=!s.frozen;if(s.frozen){s.video.pause();toast('Preview frozen and audio silenced. The original tab or screen continues running.')}else s.video.play().catch(e=>toast('Resume blocked: '+safeError(e),true));}
+ setAudio(s);updateTvTiles();renderTVStatus();renderSourceList();revealTV();
+}
+function stepTVSelection(dx,dy){
+ let tiles=shown();if(!tiles.length)return;
+ const cur=tvSelected();let index=tiles.findIndex(s=>s.id===cur?.id);if(index<0)index=0;
+ let next=index;
+ if(prefs.layout==='grid'){
+   const cols=gridColumns(tiles.length),col=index%cols,row=Math.floor(index/cols);
+   if(dx)next=clamp(index+dx,row*cols,Math.min(tiles.length-1,row*cols+cols-1));
+   else if(dy){const target=(row+dy)*cols+col;if(target>=0&&target<tiles.length)next=target;else if(dy>0&&row+dy<gridRows(tiles.length))next=tiles.length-1}
+ }else next=(index+(dx||dy>0?1:-1)+tiles.length)%tiles.length;
+ if(prefs.layout==='focus'&&tiles[next].id!==mainId)setMain(tiles[next].id);else selectSource(tiles[next].id);
+}
+function setTVMode(value){prefs.tvMode=!!value;save();renderStage();renderTVStatus();revealTV();}
+function handleTVKey(e){
+ if(!prefs.tvMode)return false;
+ const key=e.key,code=e.code;
+ if(e.ctrlKey||e.altKey||e.metaKey)return false;
+ if(e.target?.closest?.('input,textarea,select,[contenteditable]'))return false;
+ // Leave native button OK/Enter alone when a DOM button is explicitly focused.
+ // In TV mode OK is reserved for selected-stream playback, even after a setup button was clicked.
+ let handled=true;
+ if(['ArrowLeft','Left','GamepadDPadLeft'].includes(key))stepTVSelection(-1,0);
+ else if(['ArrowRight','Right','GamepadDPadRight'].includes(key))stepTVSelection(1,0);
+ else if(['ArrowUp','Up','GamepadDPadUp'].includes(key)){if(e.shiftKey)tvChangeVolume(5);else stepTVSelection(0,-1)}
+ else if(['ArrowDown','Down','GamepadDPadDown'].includes(key)){if(e.shiftKey)tvChangeVolume(-5);else stepTVSelection(0,1)}
+ else if(['Enter','OK','Select','Accept',' ','Spacebar','MediaPlayPause','MediaPlay','MediaPause'].includes(key)||code==='NumpadEnter')tvTogglePlay();
+ else if(['+','=','Add','NumpadAdd'].includes(key))tvChangeVolume(5);
+ else if(['-','_','Subtract','NumpadSubtract'].includes(key))tvChangeVolume(-5);
+ else if(['ContextMenu','Menu'].includes(key)){setCinemaManager(!cinemaManagerOpen)}
+ else if(key.toLowerCase()==='c'){prefs.fit=prefs.fit==='contain'?'cover':'contain';save();applyPreferences();revealTV()}
+ else if(key.toLowerCase()==='a')setAudioMode(prefs.audioMode==='solo'?'mix':'solo');
+ else if(key.toLowerCase()==='g')setLayout(prefs.layout==='grid'?'focus':'grid');
+ else if(key.toLowerCase()==='v'||key.toLowerCase()==='m'){if(e.shiftKey)toggleMasterAudio();else tvToggleMute();}
+ else handled=false;
+ if(handled){e.preventDefault();e.stopPropagation();lastTVKey=key;tvKeySeen=true;$('remoteIndicator').textContent='Key received: '+(key===' '?'Space':key);revealTV()}
+ return handled;
+}
+function dispatchKeys(e){if(handleTVKey(e))return;handleCinemaKeydown(e)}
+$('topTV').addEventListener('click',()=>setTVMode(!prefs.tvMode));
+$('tvFullscreenBtn').addEventListener('click',fullScreen);
+document.querySelectorAll('[data-tv-layout]').forEach(b=>b.addEventListener('click',()=>setLayout(b.dataset.tvLayout)));
+$('tvSoloBtn').addEventListener('click',()=>setAudioMode('solo'));
+$('tvMixBtn').addEventListener('click',()=>setAudioMode('mix'));
+$('tvPlay').addEventListener('click',tvTogglePlay);$('tvVolDown').addEventListener('click',()=>tvChangeVolume(-5));$('tvVolUp').addEventListener('click',()=>tvChangeVolume(5));
+$('tvMute').addEventListener('click',tvToggleMute);$('tvModeToggle').addEventListener('click',()=>setAudioMode(prefs.audioMode==='solo'?'mix':'solo'));
+$('tvGridToggle').addEventListener('click',()=>setLayout(prefs.layout==='grid'?'focus':'grid'));
+$('tvFit').addEventListener('click',()=>{prefs.fit=prefs.fit==='contain'?'cover':'contain';save();applyPreferences();revealTV()});
+$('tvDrawerMaster').addEventListener('input',e=>{prefs.master=Number(e.target.value);save();applyPreferences()});
+$('tvMixer').addEventListener('click',()=>{if(stage.ownerDocument.fullscreenElement!==stage&&!pipWindow)fullScreen().then(()=>setCinemaManager(true));else setCinemaManager(!cinemaManagerOpen)});
+mainLayer.addEventListener('click',()=>{if(mainId!=null)selectSource(mainId)});
+stage.addEventListener('pointermove',revealTV,{passive:true});
+stage.addEventListener('pointerdown',revealTV,{passive:true});
+
+function handleCinemaKeydown(e){
+ if(e.target.closest('textarea,select,[contenteditable],input:not([type=range])')||e.ctrlKey||e.altKey||e.metaKey)return;
+ if(e.key==='Escape'&&cinemaManagerOpen){e.preventDefault();e.stopPropagation();setCinemaManager(false);return}
+ const k=e.key.toLowerCase();
+ if(k==='h'){e.preventDefault();setCinemaManager(!cinemaManagerOpen);return}
+ if(k==='f'){e.preventDefault();fullScreen();return}
+ if(k==='p'){e.preventDefault();togglePiP();return}
+ if(k==='m'){e.preventDefault();toggleMasterAudio();return}
+ if(/^[1-9]$/.test(k)){const s=sources[Number(k)-1];if(s){e.preventDefault();setMain(s.id)}}
+ if(stage.classList.contains('cinema-mode'))revealCinema();
+}
+$('hudManage').addEventListener('click',()=>setCinemaManager(!cinemaManagerOpen));
+$('hudCloseDrawer').addEventListener('click',()=>setCinemaManager(false));
+$('hudDone').addEventListener('click',()=>setCinemaManager(false));
+$('hudPin').addEventListener('click',()=>{cinemaPinned=!cinemaPinned;updateCinemaStatus();revealCinema()});
+$('hudExit').addEventListener('click',()=>{if(pipWindow&&!pipWindow.closed)pipWindow.close();else fullScreen()});
+$('hudShare').addEventListener('click',addScreen);
+$('hudMasterMute').addEventListener('click',toggleMasterAudio);
+$('hudMasterVolume').addEventListener('input',e=>{prefs.master=Number(e.target.value);save();applyPreferences();$('masterVolume').value=prefs.master});
+$('hudResetAll').addEventListener('click',()=>{sources.filter(s=>s.id!==mainId).forEach((s,i)=>{s.pos=overlayPosition(i);s.hidden=false});renderStage();renderSourceList()});
+$('hudShowAll').addEventListener('click',()=>{for(const s of sources)s.hidden=false;renderStage();renderSourceList()});
+$('hudDelay').addEventListener('change',e=>{prefs.hudDelay=Number(e.target.value);save();revealCinema()});
+stage.addEventListener('pointermove',revealCinema,{passive:true});
+stage.addEventListener('pointerdown',revealCinema,{passive:true});
+for(const el of [$('hudTop'),$('hudBottom'),$('cinemaDrawer')]){
+ el.addEventListener('pointerdown',()=>{stage.classList.add('cinema-interacting');revealCinema()},{passive:true});
+ el.addEventListener('pointerleave',revealCinema);
+}
+function endCinemaInteraction(){if(stage.classList.contains('cinema-interacting')){stage.classList.remove('cinema-interacting');revealCinema();}}
+document.addEventListener('pointerup',endCinemaInteraction);
+document.addEventListener('pointercancel',endCinemaInteraction);
+stage.addEventListener('pointerup',endCinemaInteraction);
+stage.addEventListener('pointercancel',endCinemaInteraction);
+stage.addEventListener('focusin',revealCinema);
+document.addEventListener('fullscreenchange',syncCinemaMode);
+
+const actionButton=(text,title,fn,cls='btn sm')=>{const b=document.createElement('button');b.className=cls;b.textContent=text;b.title=title;b.addEventListener('click',fn);return b};
+function renderSourceList(){const list=$('sourceList');list.replaceChildren();$('sourceCount').textContent=sources.length+' / '+MAX;if(!sources.length){const d=document.createElement('div');d.className='source-empty';d.innerHTML='No sources yet.<br>Use <strong>Share tab / screen</strong> or <strong>Add videos</strong> above.';list.append(d);renderCinemaControls();return}
+ sources.forEach((s,index)=>{const card=document.createElement('div');card.className='source-card'+(s.id===mainId?' is-main':'');const head=document.createElement('div');head.className='source-head';const num=document.createElement('div');num.className='source-num';num.textContent=index+1;const name=document.createElement('div');name.className='source-name';name.textContent=s.name;name.title='Click to rename this source';name.addEventListener('click',()=>{const input=document.createElement('input');input.className='setting';input.value=s.name;input.style.cssText='min-width:0;max-width:100%;flex:1;background:#1d3044;color:#fff;border:1px solid #6bd4e5;border-radius:4px;padding:4px';name.replaceWith(input);input.focus();input.select();const done=()=>{s.name=input.value.trim().slice(0,140)||s.name;input.replaceWith(name);name.textContent=s.name;updateOverlay(s);renderCinemaControls()};input.addEventListener('keydown',e=>{if(e.key==='Enter')done();if(e.key==='Escape')input.replaceWith(name)});input.addEventListener('blur',done,{once:true})});const kind=document.createElement('span');kind.className='source-kind';kind.textContent=s.type==='screen'?'SHARE':s.type==='file'?'FILE':'DEMO';head.append(num,name,kind);
+ const actions=document.createElement('div');actions.className='source-actions';actions.append(actionButton(s.id===mainId?'★ Main':'↑ Main','Make main video',()=>setMain(s.id),s.id===mainId?'btn sm active':'btn sm'));
+ if(s.id!==mainId)actions.append(actionButton(s.hidden?'◻ Show':'▣ Hide','Toggle overlay visibility',()=>{s.hidden=!s.hidden;renderStage();renderSourceList()}));
+ else actions.append(actionButton('⛶ Full','Fullscreen clean video stage',fullScreen));
+ if(s.type==='file')actions.append(actionButton(s.video.paused?'▶ Play':'❚❚ Pause','Play or pause local video',()=>{if(s.video.paused)s.video.play().catch(e=>toast(safeError(e),true));else s.video.pause();renderSourceList()}));
+ else actions.append(actionButton(s.frozen?'▶ Resume':'❚❚ Freeze', 'Freeze/resume local capture preview (original tab continues)',()=>{selectSource(s.id);tvTogglePlay()}));
+ actions.append(actionButton('♫ Select','Select this stream as remote/audio target',()=>selectSource(s.id)));actions.append(actionButton('✕','Remove source',()=>removeSource(s.id)));
+ const audio=document.createElement('div');audio.className='source-audio';const mute=actionButton(s.muted?'♪ Off':'♫ On','Toggle this source audio',()=>toggleSourceAudio(s));mute.disabled=!s.hasAudio;audio.append(mute);const range=document.createElement('input');range.type='range';range.min=0;range.max=100;range.value=s.volume;range.disabled=!s.hasAudio;range.title='Audio volume of '+s.name;range.setAttribute('aria-label','Volume for '+s.name);const volumeLabel=document.createElement('small');volumeLabel.textContent=s.hasAudio?s.volume+'%':'N/A';range.addEventListener('input',()=>{s.volume=Number(range.value);volumeLabel.textContent=s.volume+'%';setAudio(s);updateCinemaStatus()});audio.append(range,volumeLabel);
+ const note=document.createElement('div');note.className='source-note';if(!s.hasAudio){note.textContent='No audio track supplied by Chrome.';note.classList.add('no')}else note.textContent=prefs.audioMode==='solo'?(s.id===selectedId?'Selected audio channel':'Solo mode · this channel is currently silent'):s.id===mainId?'Main source':s.hidden?'Overlay hidden · Audio may remain active':'Mixed audio channel';
+ card.append(head,actions,audio);
+ if(s.type==='file'){
+   const tools=document.createElement('div');tools.className='file-tools';
+   const seekRow=document.createElement('div');seekRow.className='file-seek';const seek=document.createElement('input');seek.type='range';seek.min=0;seek.max=Number.isFinite(s.video.duration)?s.video.duration:100;seek.step='.05';seek.value=s.video.currentTime||0;seek.dataset.seekFor=s.id;seek.setAttribute('aria-label','Seek '+s.name);seek.addEventListener('input',()=>{if(Number.isFinite(s.video.duration))s.video.currentTime=Number(seek.value)});const time=document.createElement('span');time.dataset.timeFor=s.id;time.textContent=formatTime(s.video.currentTime)+' / '+formatTime(s.video.duration);seekRow.append(seek,time);
+   const options=document.createElement('div');options.className='file-options';const speed=document.createElement('select');speed.title='Playback speed';speed.setAttribute('aria-label','Playback speed '+s.name);for(const rate of [.5,.75,1,1.25,1.5,2]){const o=document.createElement('option');o.value=rate;o.textContent=rate+'× speed';speed.append(o)}speed.value=String(s.video.playbackRate);speed.addEventListener('change',()=>{s.video.playbackRate=Number(speed.value)});const loopLabel=document.createElement('label');const loop=document.createElement('input');loop.type='checkbox';loop.checked=s.video.loop;loop.addEventListener('change',()=>{s.video.loop=loop.checked});loopLabel.append(loop,'Loop');options.append(speed,loopLabel);tools.append(seekRow,options);card.append(tools)
+ }
+ card.append(note);list.append(card)});renderCinemaControls()}
+function updateStatus(){$('streamStatus').textContent=sources.length+' active';$('pipStatus').textContent=pipWindow&&!pipWindow.closed?'Always on top':classicPip?'Classic PiP':'Closed';$('recordStatus').innerHTML=recorder&&recorder.state==='recording'?'<span class="record-dot"></span>Recording':'Off';$('record').textContent=recorder&&recorder.state==='recording'?'■ Stop recording':'● Record';$('record').classList.toggle('danger',!!(recorder&&recorder.state==='recording'));$('topFloat').textContent=pipWindow&&!pipWindow.closed?'↩ Return from PiP':classicPip?'↩ Close PiP':'▣ Float PiP';$('topFloat').classList.toggle('active',!!pipWindow||classicPip);updateCinemaStatus()}
+async function fullScreen(){if(pipWindow&&!pipWindow.closed){toast('Close floating PiP first to fullscreen the original stage.');return}try{if(stage.ownerDocument.fullscreenElement){await stage.ownerDocument.exitFullscreen()}else await stage.requestFullscreen({navigationUI:'hide'})}catch(e){toast('Fullscreen was blocked: '+safeError(e),true)}}
+async function togglePiP(){if(pipWindow&&!pipWindow.closed){pipWindow.close();return}if(classicPip){if(document.pictureInPictureElement)await document.exitPictureInPicture();classicPip=false;updateStatus();return}if(!sources.length){toast('Add a video source before opening floating PiP.');return}
+ if(window.documentPictureInPicture?.requestWindow){try{const w=await window.documentPictureInPicture.requestWindow({width:900,height:530});pipWindow=w;const doc=w.document;doc.title='MosaicCast — Floating Stage';doc.head.append(document.querySelector('style').cloneNode(true));doc.body.className='pip-host';doc.body.append(stage);stage.classList.add('fullview');stage.classList.add('cinema-mode');stage.classList.remove('cinema-idle');doc.addEventListener('keydown',dispatchKeys);doc.addEventListener('fullscreenchange',syncCinemaMode);doc.addEventListener('pointerup',endCinemaInteraction);doc.addEventListener('pointercancel',endCinemaInteraction);revealCinema();updateCinemaStatus();doc.defaultView.addEventListener('pagehide',()=>returnFromPiP(w),{once:true});w.addEventListener('resize',()=>{}, {passive:true});updateStatus();toast('Floating always-on-top window open. Resize the window or drag the small videos inside it.');return}catch(e){toast('Document PiP unavailable: '+safeError(e)+' — trying standard video PiP.',true)}}
+ try{startDrawing();const v=$('classicPipVideo');v.srcObject=canvas.captureStream(24);v.muted=true;await v.play();if(!v.requestPictureInPicture)throw new Error('Chrome does not support Picture-in-Picture here.');await v.requestPictureInPicture();classicPip=true;updateStatus();toast('Standard video PiP open. This is a rendered composite; rearrange overlays in the main tab.')}catch(e){stopDrawingIfIdle();toast('Floating PiP was blocked: '+safeError(e)+'. Try using current desktop Chrome and opening the file in a normal top-level tab.',true)}
+}
+function returnFromPiP(w){if(pipWindow!==w||pipIsClosing)return;pipIsClosing=true;try{stageMount.append(stage);stage.classList.remove('fullview');}catch(e){toast('Unable to restore stage: '+safeError(e),true)}pipWindow=null;pipIsClosing=false;syncCinemaMode();updateStatus()}
+function drawVideo(ctx,video,r,fit='contain'){
+ const vw=video.videoWidth,vh=video.videoHeight;if(!vw||!vh||video.readyState<2)return;
+ const scale=fit==='cover'?Math.max(r.w/vw,r.h/vh):Math.min(r.w/vw,r.h/vh);let w=vw*scale,h=vh*scale;let dx=r.x+(r.w-w)/2,dy=r.y+(r.h-h)/2;
+ try{ctx.save();ctx.beginPath();ctx.rect(r.x,r.y,r.w,r.h);ctx.clip();ctx.drawImage(video,dx,dy,w,h);ctx.restore()}catch{try{ctx.restore()}catch{}}
+}
+function composite(){const c=drawCtx,W=canvas.width,H=canvas.height;
+ if(prefs.layout==='grid'){c.fillStyle='#000';c.fillRect(0,0,W,H);const tiles=shown(),cols=gridColumns(tiles.length),rows=gridRows(tiles.length),gap=5;
+  tiles.forEach((x,i)=>{const col=i%cols,row=Math.floor(i/cols),w=W/cols,h=H/rows;const r={x:col*w+gap,y:row*h+gap,w:w-2*gap,h:h-2*gap};c.fillStyle='#03080e';c.fillRect(r.x,r.y,r.w,r.h);drawVideo(c,x.video,r,prefs.fit)});return}
+ if(prefs.layout==='focus'){c.fillStyle='#000';c.fillRect(0,0,W,H);const x=sById(mainId);if(x)drawVideo(c,x.video,{x:0,y:0,w:W,h:H},prefs.fit);return}
+ c.fillStyle='#000';c.fillRect(0,0,W,H);const s=sById(mainId);if(s)drawVideo(c,s.video,{x:0,y:0,w:W,h:H},prefs.fit);for(const x of sources){if(x.id===mainId||x.hidden)continue;const p=x.pos,r={x:p.x*W,y:p.y*H,w:p.w*W,h:p.h*H};c.fillStyle='#000';c.fillRect(r.x,r.y,r.w,r.h);drawVideo(c,x.video,r,prefs.fit);if(!document.fullscreenElement){c.lineWidth=2;c.strokeStyle='#ffffffad';c.strokeRect(r.x,r.y,r.w,r.h)}}}
+function startDrawing(){if(drawTimer)return;const tick=()=>{drawTimer=requestAnimationFrame(tick);composite()};tick()}
+function stopDrawingIfIdle(){if(recorder?.state==='recording'||classicPip||document.pictureInPictureElement=== $('classicPipVideo'))return;cancelAnimationFrame(drawTimer);drawTimer=0}
+function snapshot(){composite();try{canvas.toBlob(blob=>{if(!blob){toast('Could not create screenshot.',true);return}downloadBlob(blob,'MosaicCast-snapshot-'+dateStamp()+'.png')},'image/png')}catch(e){toast('Screenshot failed: '+safeError(e),true)}}
+function dateStamp(){return new Date().toISOString().replace(/[:.]/g,'-')}
+function downloadBlob(blob,name){const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=name;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),15000)}
+async function startRecording(){if(recorder?.state==='recording'){stopRecording();return}if(!sources.length){toast('Add a video before recording.',true);return}if(!window.MediaRecorder||!canvas.captureStream){toast('Chrome MediaRecorder is unavailable.',true);return}
+ try{startDrawing();recordStream=canvas.captureStream(24);recordAudioCleanup=[];
+ const audios=sources.filter(s=>s.hasAudio&&!s.muted);
+ if(audios.length){try{recordAudioContext=new(window.AudioContext||window.webkitAudioContext)();const dest=recordAudioContext.createMediaStreamDestination();for(const s of audios){let audioStream=s.stream;if(s.type==='file'&&typeof s.video.captureStream==='function')audioStream=s.video.captureStream();if(!audioStream||!audioStream.getAudioTracks().length)continue;const node=recordAudioContext.createMediaStreamSource(audioStream),gain=recordAudioContext.createGain();gain.gain.value=s.video.muted?0:s.video.volume;s.recordGain=gain;node.connect(gain);gain.connect(dest);recordAudioCleanup.push(node,gain)}if(recordAudioCleanup.length){const tr=dest.stream.getAudioTracks()[0];if(tr)recordStream.addTrack(tr)}await recordAudioContext.resume()}catch(e){toast('Recording video without audio: '+safeError(e),true)}}
+ const type=['video/webm;codecs=vp9,opus','video/webm;codecs=vp8,opus','video/webm'].find(t=>MediaRecorder.isTypeSupported(t));if(!type)throw new Error('No compatible WebM format');recorder=new MediaRecorder(recordStream,{mimeType:type,videoBitsPerSecond:4500000});recordChunks=[];recordStarted=Date.now();const r=recorder;r.ondataavailable=e=>{if(e.data?.size)recordChunks.push(e.data)};r.onerror=e=>toast('Recording problem: '+safeError(e.error||e),true);r.onstop=()=>{const blob=new Blob(recordChunks,{type:type.split(';')[0]});if(blob.size)downloadBlob(blob,'MosaicCast-recording-'+dateStamp()+'.webm');else toast('No recording data was received.',true);recordChunks=[];cleanupRecording();updateStatus()};r.start(1000);updateStatus();toast('Recording started: main video + visible overlay videos.')}
+ catch(e){cleanupRecording();toast('Could not record: '+safeError(e),true)}}
+function stopRecording(){try{if(recorder&&recorder.state!=='inactive')recorder.stop();else cleanupRecording()}catch(e){toast(safeError(e),true);cleanupRecording()}updateStatus()}
+function cleanupRecording(){recordStream?.getTracks().forEach(t=>t.stop());recordStream=null;recordAudioCleanup.forEach(n=>{try{n.disconnect()}catch{}});recordAudioCleanup=[];sources.forEach(s=>s.recordGain=null);recordAudioContext?.close().catch(()=>{});recordAudioContext=null;recorder=null;stopDrawingIfIdle()}
+function showHelp(){ $('helpModal').classList.remove('hidden')}
+$('helpBtn').addEventListener('click',showHelp);$('helpClose').addEventListener('click',()=>$('helpModal').classList.add('hidden'));$('helpModal').addEventListener('click',e=>{if(e.target===$('helpModal'))$('helpModal').classList.add('hidden')});
+$('addScreen').addEventListener('click',addScreen);$('addFiles').addEventListener('click',()=>$('filePicker').click());$('filePicker').addEventListener('change',e=>addFiles([...e.target.files]));$('addDemo').addEventListener('click',addDemo);
+$('topFullscreen').addEventListener('click',fullScreen);$('topFloat').addEventListener('click',togglePiP);$('swapFit').addEventListener('click',()=>{prefs.fit=prefs.fit==='contain'?'cover':'contain';save();applyPreferences()});
+$('snapshot').addEventListener('click',snapshot);$('record').addEventListener('click',startRecording);
+$('captureAudio').addEventListener('change',e=>{prefs.captureAudio=e.target.checked;save()});$('muteNew').addEventListener('change',e=>{prefs.muteNew=e.target.checked;save()});$('masterVolume').addEventListener('input',e=>{prefs.master=Number(e.target.value);save();applyPreferences()});$('muteAll').addEventListener('click',()=>{prefs.masterMuted=!prefs.masterMuted;save();applyPreferences();renderSourceList()});$('videoFit').addEventListener('change',e=>{prefs.fit=e.target.value;save();applyPreferences()});$('overlayPreset').addEventListener('change',e=>{prefs.preset=e.target.value;save()});$('snapEdges').addEventListener('change',e=>{prefs.snap=e.target.checked;save()});
+$('resetPositions').addEventListener('click',()=>{sources.filter(s=>s.id!==mainId).forEach((s,i)=>{s.pos=overlayPosition(i);s.hidden=false});renderStage();renderSourceList();toast('Overlay sizes and positions reset.')});$('closeAll').addEventListener('click',()=>{if(!sources.length)return;if(confirm('Stop and remove all '+sources.length+' video sources?')){for(const s of [...sources])removeSource(s.id);toast('All captures stopped.')}});
+$('classicPipVideo').addEventListener('leavepictureinpicture',()=>{classicPip=false;$('classicPipVideo').srcObject?.getTracks().forEach(t=>t.stop());$('classicPipVideo').srcObject=null;stopDrawingIfIdle();updateStatus()});
+stage.addEventListener('dblclick',e=>{if(e.target===stage||e.target===mainLayer||e.target.parentElement===mainLayer)fullScreen()});
+document.addEventListener('keydown',e=>{if(!$('helpModal').classList.contains('hidden')){if(e.key==='Escape')$('helpModal').classList.add('hidden');return}dispatchKeys(e)});
+window.addEventListener('beforeunload',()=>{if(pipWindow&&!pipWindow.closed)pipWindow.close();for(const s of sources){s.demo?.stop();s.stream?.getTracks().forEach(t=>t.stop());if(s.objectUrl)URL.revokeObjectURL(s.objectUrl)}});
+applyPreferences();updateStatus();renderCinemaControls();renderStage();renderTVStatus();revealTV();
+})();
+</script>
+</body></html>
