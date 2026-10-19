@@ -18,8 +18,8 @@ import java.util.concurrent.*;
 import org.json.JSONObject;
 public class MainActivity extends Activity {
  WebView web; ServerSocket server; volatile boolean active=true;
- final String pin;
- final String receiverId;
+ String pin;
+ String receiverId;
  final String version="1.3.0";
  volatile int badAttempts=0;
  volatile long lockUntil=0;
