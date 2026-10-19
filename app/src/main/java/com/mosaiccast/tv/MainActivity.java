@@ -18,11 +18,38 @@ import java.util.concurrent.*;
 import org.json.JSONObject;
 public class MainActivity extends Activity {
  WebView web; ServerSocket server; volatile boolean active=true;
- final String pin=String.format(Locale.US,"%06d",new SecureRandom().nextInt(1000000));
+ final String pin;
+ final String receiverId;
+ final String version="1.3.0";
+ volatile int badAttempts=0;
+ volatile long lockUntil=0;
+ synchronized int checkPin(String submitted) {
+   if(System.currentTimeMillis()<lockUntil)return 429;
+   if(pin.equals(submitted)){badAttempts=0;return 200;}
+   if(++badAttempts>=10){badAttempts=0;lockUntil=System.currentTimeMillis()+30000;}
+   return 403;
+ }
+ String receiverInfo() throws Exception {
+   return new JSONObject().put("ready",true).put("receiver","MosaicCast TV")
+     .put("version",version).put("receiverId",receiverId).toString();
+ }
  volatile String id="",offer="",answer=""; volatile long created=0;
  final ExecutorService pool=Executors.newCachedThreadPool();
  static final int PORT=8765; boolean okDown=false,okLong=false;
  @Override public void onCreate(Bundle b){super.onCreate(b);
+  android.content.SharedPreferences prefs=getSharedPreferences("mosaiccast_pairing",MODE_PRIVATE);
+  String savedPin=prefs.getString("pin","");
+  if(!savedPin.matches("[0-9]{6}")){
+    savedPin=String.format(Locale.US,"%06d",new SecureRandom().nextInt(1000000));
+    prefs.edit().putString("pin",savedPin).apply();
+  }
+  pin=savedPin;
+  String savedId=prefs.getString("receiverId","");
+  if(!savedId.matches("TV-[0-9A-F]{4}")){
+    savedId="TV-"+UUID.randomUUID().toString().substring(0,4).toUpperCase(Locale.US);
+    prefs.edit().putString("receiverId",savedId).apply();
+  }
+  receiverId=savedId;
   getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON|WindowManager.LayoutParams.FLAG_FULLSCREEN);
   web=new WebView(this); web.setBackgroundColor(0xff050a13);
   web.getSettings().setJavaScriptEnabled(true);web.getSettings().setDomStorageEnabled(true);
@@ -32,6 +59,8 @@ public class MainActivity extends Activity {
   web.addJavascriptInterface(new Object(){
    @JavascriptInterface public String ip(){return localIp();}
    @JavascriptInterface public String pin(){return pin;}
+   @JavascriptInterface public String receiverId(){return receiverId;}
+   @JavascriptInterface public String version(){return version;}
   },"TVNative");
   setContentView(web);web.requestFocus();
   pool.execute(()->{try{server=new ServerSocket(PORT);while(active){Socket s=server.accept();pool.execute(()->handle(s));}}catch(Exception e){android.util.Log.e("MosaicCast","Server",e);}});
@@ -49,8 +78,21 @@ public class MainActivity extends Activity {
   JSONObject obj=null;if(method.equals("POST"))obj=new JSONObject(new String(bytes,0,n,StandardCharsets.UTF_8));
   boolean loop=sock.getInetAddress().isLoopbackAddress();
   if(method.equals("GET")&&path.equals("/")){try(InputStream f=getAssets().open("receiver.html")){ByteArrayOutputStream b=new ByteArrayOutputStream();byte[] buf=new byte[8192];int m;while((m=f.read(buf))>0)b.write(buf,0,m);reply(out,200,"text/html; charset=utf-8",b.toString("UTF-8"));}return;}
-  if(method.equals("GET")&&path.equals("/api/status")){reply(out,200,"application/json","{\"ready\":true}");return;}
-  if(method.equals("POST")&&path.equals("/api/offer")){if(!pin.equals(obj.optString("pin"))){reply(out,403,"application/json","{\"error\":\"Wrong pairing PIN\"}");return;}String sdp=obj.optString("sdp");if(sdp.length()<50){reply(out,400,"application/json","{}");return;}id=UUID.randomUUID().toString();offer=sdp;answer="";created=System.currentTimeMillis();reply(out,200,"application/json",new JSONObject().put("id",id).toString());return;}
+  if(method.equals("GET")&&path.equals("/api/status")){reply(out,200,"application/json",receiverInfo());return;}
+  if(method.equals("POST")&&path.equals("/api/verify")){
+    int check=checkPin(obj.optString("pin",""));
+    reply(out,check,"application/json",new JSONObject()
+      .put("ok",check==200).put("version",version).put("receiverId",receiverId)
+      .put("error",check==200?"":check==429?"Too many attempts; try again in 30 seconds.":"This PIN does not match the TV receiver at this address.")
+      .toString());return;
+  }
+  if(method.equals("POST")&&path.equals("/api/offer")){
+    int check=checkPin(obj.optString("pin",""));
+    if(check!=200){
+      reply(out,check,"application/json",new JSONObject()
+        .put("error",check==429?"Too many attempts. Try again in 30 seconds.":"PIN does not match this receiver; confirm TV ID and IP address.")
+        .put("receiverId",receiverId).toString());return;
+    }String sdp=obj.optString("sdp");if(sdp.length()<50){reply(out,400,"application/json","{}");return;}id=UUID.randomUUID().toString();offer=sdp;answer="";created=System.currentTimeMillis();reply(out,200,"application/json",new JSONObject().put("id",id).toString());return;}
   if(method.equals("GET")&&path.equals("/api/next")&&loop){reply(out,200,"application/json",offer.isEmpty()||System.currentTimeMillis()-created>120000?"{}":new JSONObject().put("id",id).put("sdp",offer).toString());return;}
   if(method.equals("POST")&&path.equals("/api/answer")&&loop){if(!id.equals(obj.optString("id"))){reply(out,403,"application/json","{}");return;}answer=obj.optString("sdp");reply(out,200,"application/json","{\"ok\":true}");return;}
   if(method.equals("GET")&&path.startsWith("/api/result?id=")){String key=URLDecoder.decode(path.substring(15),"UTF-8");if(!id.equals(key)){reply(out,404,"application/json","{}");return;}reply(out,200,"application/json",answer.isEmpty()?"{}":new JSONObject().put("sdp",answer).toString());return;}
